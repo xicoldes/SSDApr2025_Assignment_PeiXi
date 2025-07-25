@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const sql = require('mssql');
+const userModel = require('./models/userModel');
 const { poolPromise } = require('./dbConfig');
 
 // Controllers
@@ -22,6 +23,32 @@ app.use(express.static(path.join(__dirname, "public")));
 // Routes
 app.post('/register', authController.register);
 app.post('/login', authController.login);
+
+// // Test route to check admin user
+// app.get('/test-admin', async (req, res) => {
+//   try {
+//     const admin = await userModel.findByUsername('admin');
+    
+//     if (!admin) {
+//       return res.status(404).json({ 
+//         error: 'Admin not found',
+//         suggestion: 'Run the SQL query in the error details'
+//       });
+//     }
+
+//     // Hide password hash in response
+//     const { password_hash, ...safeAdmin } = admin; 
+//     res.json(safeAdmin);
+
+//   } catch (error) {
+//     console.error('Test route error:', error);
+//     res.status(500).json({ 
+//       error: 'Server error',
+//       details: error.message,
+//       fix: "Make sure userModel.findByUsername() is properly implemented"
+//     });
+//   }
+// });
 
 // Anime Routes
 app.get('/anime', animeController.getAllAnime);

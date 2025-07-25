@@ -1,6 +1,7 @@
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/userModel');
-const bcrypt = require('bcryptjs');
+
 
 module.exports = {
   register: async (req, res) => {
@@ -25,21 +26,25 @@ module.exports = {
   login: async (req, res) => {
     try {
       const { username, password } = req.body;
+      
+      // 1. Find user
       const user = await userModel.findByUsername(username);
-      if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+      if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
+      // 2. Compare passwords
       const validPassword = await bcrypt.compare(password, user.password_hash);
-      if (!validPassword) return res.status(401).json({ error: 'Invalid credentials' });
+      if (!validPassword) return res.status(401).json({ error: "Invalid credentials" });
 
+      // 3. Generate token
       const token = jwt.sign(
         { id: user.user_id, username: user.username, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: '1h' }
+        process.env.JWT_SECRET
       );
 
-      res.json({ token, user: { user_id: user.user_id, username: user.username, role: user.role } });
+      res.json({ token, user: { id: user.user_id, username: user.username, role: user.role } });
+      
     } catch (error) {
-      res.status(500).json({ error: 'Login failed' });
+      res.status(500).json({ error: "Login failed" });
     }
   }
 };

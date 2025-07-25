@@ -28,5 +28,21 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error: 'Failed to create anime' });
     }
+  },
+
+ deleteAnime: async (req, res) => {
+  try {
+    const animeId = req.params.id;
+    const pool = await poolPromise;
+    
+    await pool.request()
+      .input('anime_id', sql.Int, animeId)
+      .query('DELETE FROM anime WHERE anime_id = @anime_id');
+    
+    res.status(204).end();
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete anime' });
   }
+ }
 };
+
