@@ -12,7 +12,7 @@ module.exports = {
       res.status(400).json({ error: 'Invalid token' });
     }
   },
-
+  
   authorize: (roles) => {
     return (req, res, next) => {
       if (!roles.includes(req.user.role)) {

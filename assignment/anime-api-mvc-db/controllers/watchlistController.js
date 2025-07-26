@@ -2,6 +2,7 @@ const { poolPromise, sql } = require('../dbConfig');
 const { authenticate } = require('../middlewares/authMiddleware');
 
 module.exports = {
+  // Add anime to watchlist
   addToWatchlist: async (req, res) => {
     try {
       const { anime_id, status } = req.body;

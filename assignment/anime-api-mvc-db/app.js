@@ -11,9 +11,12 @@ const authController = require('./controllers/authController');
 const animeController = require('./controllers/animeController');
 const forumController = require('./controllers/forumController');
 const watchlistController = require('./controllers/watchlistController');
+const userController = require('./controllers/userController');
 
 // Middlewares
 const { authenticate, authorize } = require('./middlewares/authMiddleware');
+const forumController = require('./controllers/forumController');
+
 
 // Configuration
 app.use(express.json());
@@ -50,17 +53,47 @@ app.post('/login', authController.login);
 //   }
 // });
 
+//User Routes
+app.get('/users/:id', authenticate, userController.getUserProfile);
+app.put('/users/:id', authenticate, userController.updateProfile);
+
 // Anime Routes
+//--------------
+// Get all anime
 app.get('/anime', animeController.getAllAnime);
+// Get anime by ID
 app.get('/anime/:id', animeController.getAnimeById);
+// Create anime route with authentication and authorization
 app.post('/anime', authenticate, authorize(['admin']), animeController.createAnime);
+// Update and delete routes for anime
+app.put('/anime/:id', authenticate, authorize(['admin']), animeController.updateAnime);
+app.delete('/anime/:id', authenticate, authorize(['admin']), animeController.deleteAnime);
 
 // Forum Routes
+//---------------
+// Create a new thread
 app.post('/threads', authenticate, forumController.createThread);
+// Get all threads for a specific anime
 app.get('/threads/:anime_id', forumController.getThreadsByAnime);
+// create a comment on a thread
+app.post('/comments', authenticate, forumController.createComment);
+// Get comments for a specific thread
+app.get('/comments/:thread_id', forumController.getComments);
+// Upvote a comment
+app.put('/comments/:id/upvote', authenticate, forumController.upvoteComment);
+// Delete a thread and comments within it (only admin can access)
+app.delete('/threads/:id', 
+  authenticate, 
+  authorize(['admin']), 
+  forumController.deleteThread
+);
+
 
 // Watchlist Routes
+//----------------
+// Add to watchlist
 app.post('/watchlist', authenticate, watchlistController.addToWatchlist);
+// Remove from watchlist
 app.get('/watchlist/:user_id', authenticate, watchlistController.getUserWatchlist);
 
 // Start server

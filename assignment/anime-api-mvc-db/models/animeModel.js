@@ -2,10 +2,17 @@ const { poolPromise, sql } = require('../dbConfig');
 
 class AnimeModel {
   async getAll() {
-    const pool = await poolPromise;
-    const result = await pool.request().query('SELECT * FROM anime');
-    return result.recordset;
-  }
+  const pool = await poolPromise;
+  const result = await pool.request().query(`
+    SELECT 
+      anime_id, title, description, genre, episodes, 
+      CONVERT(varchar, release_date, 23) as release_date,
+      studio, rating, poster_url,
+      created_at, updated_at
+    FROM anime
+  `);
+  return result.recordset;
+}
 
   async getById(anime_id) {
     const pool = await poolPromise;
