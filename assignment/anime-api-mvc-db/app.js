@@ -15,7 +15,6 @@ const userController = require('./controllers/userController');
 
 // Middlewares
 const { authenticate, authorize } = require('./middlewares/authMiddleware');
-const forumController = require('./controllers/forumController');
 
 
 // Configuration

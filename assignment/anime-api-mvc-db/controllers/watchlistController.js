@@ -7,6 +7,19 @@ module.exports = {
     try {
       const { anime_id, status } = req.body;
       const pool = await poolPromise;
+
+          // Check if anime already exists in user's watchlist
+      const existing = await pool.request()
+      .input('user_id', sql.Int, req.user.id)
+      .input('anime_id', sql.Int, anime_id)
+      .query(`
+        SELECT * FROM user_anime_list 
+        WHERE user_id = @user_id AND anime_id = @anime_id
+      `);
+
+    if (existing.recordset.length > 0) {
+      return res.status(400).json({ error: 'Anime already in watchlist' });
+    }
       
       await pool.request()
         .input('user_id', sql.Int, req.user.id)
