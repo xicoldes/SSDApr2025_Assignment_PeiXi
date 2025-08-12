@@ -1,0 +1,171 @@
+1) for anyone to use (no need login from admin or user)
+----------------------------------------------------
+get/anime
+
+get/anime/[id number]
+----------------------------------------------------------------------------------------------------
+2) Register a new user:
+-------------------
+POST /register
+Body (JSON):
+{
+  "username": "newuser",
+  "email": "new@example.com",
+  "password": "password123"
+}
+------------------------------------------------------------------------------------------------
+3) login:
+---------
+POST /login
+Body (JSON):
+{
+  "username": "admin",
+  "password": "admin123"
+}
+------------------------------------------------------------------------------------------------
+4) Create new anime (admin only):
+---------------------------------
+POST /anime
+Headers: 
+  Authorization: Bearer [admin-token]
+Body (JSON):
+{
+  "title": "Hunter x Hunter",
+  "description": "Gon Freecss aspires to become a Hunter to find his father",
+  "genre": "Action, Adventure, Fantasy",
+  "episodes": 148,
+  "studio": "Madhouse"
+}
+------------------------------------------------------------------------------------------------
+5) Watchlist Tests - Add to watchlist (admin or user):
+------------------------------------------------------
+POST /watchlist
+Headers: 
+  Authorization: Bearer [user-token]
+Body (JSON):
+{
+  "anime_id": 2,
+  "status": "watching"
+}
+------------------------------------------------------------------------------------------------
+6) Get user watchlist:
+----------------------
+GET /watchlist/2
+Headers: 
+  Authorization: Bearer [user-token]
+------------------------------------------------------------------------------------------------
+7) Forum Tests - Create thread (admin or user)
+----------------------------------------------
+POST /threads
+Headers: 
+  Authorization: Bearer [user-token]
+Body (JSON):
+{
+  "anime_id": 1,
+  "title": "Best JoJo villain?",
+  "content": "Who do you think is the best villain in JoJo?"
+}
+------------------------------------------------------------------------------------------------
+8) Create comment:
+------------------
+POST /comments
+Headers: 
+  Authorization: Bearer [user-token]
+Body (JSON):
+{
+  "thread_id": 1,
+  "content": "Dio is clearly the best villain!"
+}
+------------------------------------------------------------------------------------------------
+9) User profile tests - Get user profile
+----------------------------------------
+GET /users/1
+Headers: 
+  Authorization: Bearer [user-token]
+------------------------------------------------------------------------------------------------
+10) Update profile 
+------------------
+PUT /users/1
+Headers: 
+  Authorization: Bearer [user-token]
+Body (JSON):
+{
+  "bio": "Big anime fan since childhood"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

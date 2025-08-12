@@ -64,5 +64,67 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error: 'Failed to update profile' });
     }
+  },
+
+  // NEW: Delete user (admin only)
+  deleteUser: async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const pool = await poolPromise;
+
+      console.log(`Starting deletion process for user ID: ${userId}`);
+
+      const transaction = new sql.Transaction(pool);
+      await transaction.begin();
+
+      try {
+        // 1. Delete comments by this user
+        console.log('Deleting user comments...');
+        const deleteComments = new sql.Request(transaction);
+        await deleteComments
+          .input('user_id', sql.Int, userId)
+          .query('DELETE FROM forum_comments WHERE user_id = @user_id');
+
+        // 2. Delete threads by this user
+        console.log('Deleting user threads...');
+        const deleteThreads = new sql.Request(transaction);
+        await deleteThreads
+          .input('user_id', sql.Int, userId)
+          .query('DELETE FROM forum_threads WHERE user_id = @user_id');
+
+        // 3. Delete watchlist entries
+        console.log('Deleting watchlist entries...');
+        const deleteWatchlist = new sql.Request(transaction);
+        await deleteWatchlist
+          .input('user_id', sql.Int, userId)
+          .query('DELETE FROM user_anime_list WHERE user_id = @user_id');
+
+        // 4. Delete the user
+        console.log('Deleting user...');
+        const deleteUser = new sql.Request(transaction);
+        const userResult = await deleteUser
+          .input('user_id', sql.Int, userId)
+          .query('DELETE FROM users WHERE user_id = @user_id');
+
+        await transaction.commit();
+        console.log('User deletion transaction committed successfully');
+        
+        if (userResult.rowsAffected[0] === 0) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.status(204).end();
+      } catch (innerError) {
+        console.error('Inner transaction error:', innerError);
+        await transaction.rollback();
+        throw innerError;
+      }
+    } catch (error) {
+      console.error('Full error details:', error);
+      res.status(500).json({ 
+        error: 'Failed to delete user',
+        details: error.message
+      });
+    }
   }
 };

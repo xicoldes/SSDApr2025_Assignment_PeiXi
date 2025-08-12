@@ -22,43 +22,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Routes
+// AUTH ROUTES
 app.post('/register', authController.register);
 app.post('/login', authController.login);
 
-// // Test route to check admin user
-// app.get('/test-admin', async (req, res) => {
-//   try {
-//     const admin = await userModel.findByUsername('admin');
-    
-//     if (!admin) {
-//       return res.status(404).json({ 
-//         error: 'Admin not found',
-//         suggestion: 'Run the SQL query in the error details'
-//       });
-//     }
-
-//     // Hide password hash in response
-//     const { password_hash, ...safeAdmin } = admin; 
-//     res.json(safeAdmin);
-
-//   } catch (error) {
-//     console.error('Test route error:', error);
-//     res.status(500).json({ 
-//       error: 'Server error',
-//       details: error.message,
-//       fix: "Make sure userModel.findByUsername() is properly implemented"
-//     });
-//   }
-// });
-
-//User Routes
+// USER ROUTES
 app.get('/users/:id', authenticate, userController.getUserProfile);
 app.put('/users/:id', authenticate, userController.updateProfile);
+app.delete('/users/:id', authenticate, authorize(['admin']), userController.deleteUser); // NEW
 
-// Anime Routes
-//--------------
-// Get all anime
+// ANIME ROUTES
+//---------------------
+// Get all anime (now with pagination/filtering)
 app.get('/anime', animeController.getAllAnime);
 // Get anime by ID
 app.get('/anime/:id', animeController.getAnimeById);
@@ -68,32 +43,36 @@ app.post('/anime', authenticate, authorize(['admin']), animeController.createAni
 app.put('/anime/:id', authenticate, authorize(['admin']), animeController.updateAnime);
 app.delete('/anime/:id', authenticate, authorize(['admin']), animeController.deleteAnime);
 
-// Forum Routes
-//---------------
+// FORUM ROUTES
+//---------------------
 // Create a new thread
 app.post('/threads', authenticate, forumController.createThread);
-// Get all threads for a specific anime
+// Get all threads for a specific anime (now with pagination)
 app.get('/threads/:anime_id', forumController.getThreadsByAnime);
-// create a comment on a thread
+// Update a thread (NEW)
+app.put('/threads/:id', authenticate, forumController.updateThread);
+// Delete a thread and comments within it (admin only)
+app.delete('/threads/:id', authenticate, authorize(['admin']), forumController.deleteThread);
+
+// Create a comment on a thread
 app.post('/comments', authenticate, forumController.createComment);
 // Get comments for a specific thread
 app.get('/comments/:thread_id', forumController.getComments);
 // Upvote a comment
 app.put('/comments/:id/upvote', authenticate, forumController.upvoteComment);
-// Delete a thread and comments within it (only admin can access)
-app.delete('/threads/:id', 
-  authenticate, 
-  authorize(['admin']), 
-  forumController.deleteThread
-);
+// Delete a comment (NEW)
+app.delete('/comments/:id', authenticate, forumController.deleteComment);
 
-
-// Watchlist Routes
-//----------------
+// WATCHLIST ROUTES
+//---------------------
 // Add to watchlist
 app.post('/watchlist', authenticate, watchlistController.addToWatchlist);
-// Remove from watchlist
+// Get user watchlist (now with pagination/filtering)
 app.get('/watchlist/:user_id', authenticate, watchlistController.getUserWatchlist);
+// Update watchlist entry (NEW)
+app.put('/watchlist/:anime_id', authenticate, watchlistController.updateWatchlistEntry);
+// Remove from watchlist (NEW)
+app.delete('/watchlist/:anime_id', authenticate, watchlistController.removeFromWatchlist);
 
 // Start server
 const PORT = process.env.PORT || 3000;
@@ -108,3 +87,5 @@ process.on("SIGINT", async () => {
   console.log("Database connections closed");
   process.exit(0);
 });
+
+module.exports = app; // Export app for testing

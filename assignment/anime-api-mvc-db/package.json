@@ -1,14 +1,21 @@
 {
   "name": "anime-api-mvc-db",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:debug": "jest --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "testTimeout": 10000
+  },
   "dependencies": {
     "bad-words": "^4.0.0",
     "bcryptjs": "^3.0.2",
@@ -18,6 +25,12 @@
     "jsonwebtoken": "^9.0.2",
     "mssql": "^11.0.1",
     "redis": "^5.6.0",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "winston": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.5",
+    "supertest": "^7.1.4"
   }
 }
