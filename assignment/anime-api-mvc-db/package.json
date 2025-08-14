@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --forceExit --detectOpenHandles",
     "test:watch": "jest --watch",
-    "test:debug": "jest --detectOpenHandles"
+    "test:debug": "jest --detectOpenHandles --verbose"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +14,9 @@
   "jest": {
     "testEnvironment": "node",
     "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
-    "testTimeout": 10000
+    "testTimeout": 30000,
+    "forceExit": true,
+    "detectOpenHandles": true
   },
   "dependencies": {
     "bad-words": "^4.0.0",

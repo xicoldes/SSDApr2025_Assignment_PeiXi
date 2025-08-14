@@ -22,7 +22,14 @@ const poolPromise = new sql.ConnectionPool(dbConfig)
   })
   .catch(err => {
     console.error('Database Connection Failed:', err);
-    process.exit(1);
+    
+    // Don't exit if we're in test environment
+    if (process.env.NODE_ENV !== 'test') {
+      process.exit(1);
+    } else {
+      // Just throw the error in test mode
+      throw err;
+    }
   });
 
 // Export both the SQL library and pool promise
