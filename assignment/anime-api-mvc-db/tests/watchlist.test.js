@@ -6,16 +6,17 @@ describe('Watchlist API Tests', () => {
   let userId;
   
   beforeAll(async () => {
-    // Login as regular user
-    const userLogin = await request(app)
-      .post('/login')
-      .send({
-        username: 'jojofan',
-        password: 'jojo123'
-      });
-    userToken = userLogin.body.token;
-    userId = userLogin.body.user.id;
-  });
+  // Login as regular user
+  const userLogin = await request(app)
+    .post('/login')
+    .send({
+      username: 'jojofan',
+      password: 'jojo123'
+    });
+    
+  userToken = userLogin.body.token;
+  userId = userLogin.body.user.id; // This should now work with the fixed login response
+});
 
   describe('POST /watchlist', () => {
     test('should add anime to watchlist', async () => {
@@ -93,8 +94,10 @@ describe('Watchlist API Tests', () => {
       
       // Only test sorting if we have more than one item
       if (titles.length > 1) {
-        const sortedTitles = [...titles].sort((a, b) => a.localeCompare(b));
-        expect(titles).toEqual(sortedTitles);
+        // Check if titles are sorted (each title should be <= next title)
+        for (let i = 0; i < titles.length - 1; i++) {
+          expect(titles[i].localeCompare(titles[i + 1])).toBeLessThanOrEqual(0);
+        }
       } else {
         // If only one or no items, the test should pass
         expect(titles.length).toBeGreaterThanOrEqual(0);

@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "test": "jest --forceExit --detectOpenHandles",
-    "test:watch": "jest --watch",
-    "test:debug": "jest --detectOpenHandles --verbose"
+    "test": "jest --forceExit --detectOpenHandles --maxWorkers=1",
+    "test:watch": "jest --watch --maxWorkers=1",
+    "test:debug": "jest --detectOpenHandles --verbose --maxWorkers=1"
   },
   "keywords": [],
   "author": "",
@@ -13,14 +13,19 @@
   "description": "",
   "jest": {
     "testEnvironment": "node",
-    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ],
     "testTimeout": 30000,
     "forceExit": true,
-    "detectOpenHandles": true
+    "detectOpenHandles": true,
+    "maxWorkers": 1,
+    "verbose": true,
+    "collectCoverage": false
   },
   "dependencies": {
     "bad-words": "^4.0.0",
-    "bcryptjs": "^3.0.2",
+    "bcryptjs": "2.4.3",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "joi": "^17.13.3",

@@ -37,72 +37,81 @@ module.exports = {
   },
 
   getUserWatchlist: async (req, res) => {
-    try {
-      const { page = 1, limit = 10, status, sortBy = 'updated_at', sortOrder = 'DESC' } = req.query;
-      const offset = (page - 1) * limit;
-      const pool = await poolPromise;
-      
-      let query = `
-        SELECT a.*, ual.status, ual.rating, ual.progress, ual.notes, ual.updated_at as watchlist_updated
-        FROM user_anime_list ual
-        JOIN anime a ON ual.anime_id = a.anime_id
-        WHERE ual.user_id = @user_id
-      `;
-      
-      const request = pool.request().input('user_id', sql.Int, req.params.user_id);
-      
-      // Add status filter if provided
-      if (status) {
-        query += ` AND ual.status = @status`;
-        request.input('status', sql.VarChar, status);
-      }
-      
-      // Add sorting
-      const validSortColumns = ['updated_at', 'title', 'rating'];
-      const sortColumn = validSortColumns.includes(sortBy) ? 
-        (sortBy === 'updated_at' ? 'ual.updated_at' : 
-         sortBy === 'title' ? 'a.title' : 'ual.rating') : 'ual.updated_at';
-      const sortDirection = ['ASC', 'DESC'].includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
-      
-      query += ` ORDER BY ${sortColumn} ${sortDirection}`;
-      query += ` OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY`;
-      
-      request.input('offset', sql.Int, offset);
-      request.input('limit', sql.Int, parseInt(limit));
-      
-      const result = await request.query(query);
-      
-      // Get total count
-      let countQuery = `
-        SELECT COUNT(*) as total 
-        FROM user_anime_list ual 
-        WHERE ual.user_id = @user_id
-      `;
-      
-      const countRequest = pool.request().input('user_id', sql.Int, req.params.user_id);
-      
-      if (status) {
-        countQuery += ` AND ual.status = @status`;
-        countRequest.input('status', sql.VarChar, status);
-      }
-      
-      const countResult = await countRequest.query(countQuery);
-      const total = countResult.recordset[0].total;
-      
-      res.json({
-        data: result.recordset,
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total,
-          totalPages: Math.ceil(total / limit)
-        }
-      });
-    } catch (error) {
-      console.error('Get watchlist error:', error);
-      res.status(500).json({ error: 'Failed to fetch watchlist' });
+  try {
+    const { page = 1, limit = 10, status, sortBy = 'updated_at', sortOrder = 'DESC' } = req.query;
+    const offset = (page - 1) * limit;
+    const pool = await poolPromise;
+    
+    let query = `
+      SELECT a.*, ual.status, ual.rating, ual.progress, ual.notes, ual.updated_at as watchlist_updated
+      FROM user_anime_list ual
+      JOIN anime a ON ual.anime_id = a.anime_id
+      WHERE ual.user_id = @user_id
+    `;
+    
+    const request = pool.request().input('user_id', sql.Int, req.params.user_id);
+    
+    // Add status filter if provided
+    if (status) {
+      query += ` AND ual.status = @status`;
+      request.input('status', sql.VarChar, status);
     }
-  },
+    
+    // Add sorting - FIXED VERSION
+    const validSortColumns = ['updated_at', 'title', 'rating'];
+    let sortColumn;
+    
+    if (sortBy === 'updated_at') {
+      sortColumn = 'ual.updated_at';
+    } else if (sortBy === 'title') {
+      sortColumn = 'a.title';
+    } else if (sortBy === 'rating') {
+      sortColumn = 'ual.rating';
+    } else {
+      sortColumn = 'ual.updated_at'; // default
+    }
+    
+    const sortDirection = ['ASC', 'DESC'].includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
+    
+    query += ` ORDER BY ${sortColumn} ${sortDirection}`;
+    query += ` OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY`;
+    
+    request.input('offset', sql.Int, offset);
+    request.input('limit', sql.Int, parseInt(limit));
+    
+    const result = await request.query(query);
+    
+    // Get total count
+    let countQuery = `
+      SELECT COUNT(*) as total 
+      FROM user_anime_list ual 
+      WHERE ual.user_id = @user_id
+    `;
+    
+    const countRequest = pool.request().input('user_id', sql.Int, req.params.user_id);
+    
+    if (status) {
+      countQuery += ` AND ual.status = @status`;
+      countRequest.input('status', sql.VarChar, status);
+    }
+    
+    const countResult = await countRequest.query(countQuery);
+    const total = countResult.recordset[0].total;
+    
+    res.json({
+      data: result.recordset,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error('Get watchlist error:', error);
+    res.status(500).json({ error: 'Failed to fetch watchlist' });
+  }
+},
 
   // NEW: Update watchlist entry
   updateWatchlistEntry: async (req, res) => {
