@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ANICONNECT TERMINAL - NOSTROMO SYSTEM</title>
     <link rel="stylesheet" href="/css/nostromo.css">
-    <script src="/js/nostromo.js"></script>
 </head>
 <body>
     <!-- Scanlines overlay -->
@@ -36,6 +35,7 @@
             <button class="nav-btn" data-section="watchlist">WATCHLIST</button>
             <button class="nav-btn" data-section="forum">FORUM.SYS</button>
             <button class="nav-btn" data-section="profile">USER.PROF</button>
+            <button class="nav-btn" data-section="admin" style="display: none;">ADMIN.CTRL</button>
         </nav>
 
         <!-- Main content area -->
@@ -62,6 +62,30 @@
                         <button id="register-toggle" class="link-button">CREATE NEW USER PROFILE</button>
                     </div>
                 </div>
+
+                <!-- Registration Form (Hidden by default) -->
+                <div id="register-container" class="login-container" style="display: none;">
+                    <form id="register-form" class="terminal-form">
+                        <div class="form-group">
+                            <label>NEW USER.ID:</label>
+                            <input type="text" id="reg-username" class="terminal-input" placeholder="ENTER USERNAME" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label>EMAIL.ADDR:</label>
+                            <input type="email" id="reg-email" class="terminal-input" placeholder="ENTER EMAIL" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label>ACCESS.CODE:</label>
+                            <input type="password" id="reg-password" class="terminal-input" placeholder="ENTER PASSWORD (MIN 6 CHARS)" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label>CONFIRM.CODE:</label>
+                            <input type="password" id="reg-confirm-password" class="terminal-input" placeholder="CONFIRM PASSWORD" autocomplete="off">
+                        </div>
+                        <button type="submit" class="terminal-button">CREATE PROFILE</button>
+                        <button type="button" id="back-to-login" class="terminal-button" style="margin-left: 10px;">RETURN TO LOGIN</button>
+                    </form>
+                </div>
             </section>
 
             <!-- Dashboard Section -->
@@ -81,11 +105,18 @@
                         </div>
                     </div>
                     <div class="dashboard-card">
+                        <h3>MY WATCHLIST STATS</h3>
+                        <div id="watchlist-stats" class="status-grid">
+                            <div>WATCHING: <span id="watching-count" class="status-value">-</span></div>
+                            <div>COMPLETED: <span id="completed-count" class="status-value">-</span></div>
+                            <div>PLANNED: <span id="planned-count" class="status-value">-</span></div>
+                            <div>TOTAL: <span id="total-count" class="status-value">-</span></div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
                         <h3>RECENT ACTIVITY</h3>
                         <div id="recent-activity" class="activity-log">
-                            <div class="activity-item">> NEW USER REGISTERED</div>
-                            <div class="activity-item">> FORUM POST CREATED</div>
-                            <div class="activity-item">> ANIME ADDED TO DB</div>
+                            <div class="activity-item">> SYSTEM INITIALIZED</div>
                         </div>
                     </div>
                 </div>
@@ -102,14 +133,30 @@
                     <div class="filter-controls">
                         <select id="genre-filter" class="terminal-select">
                             <option value="">ALL GENRES</option>
-                            <option value="action">ACTION</option>
-                            <option value="comedy">COMEDY</option>
-                            <option value="drama">DRAMA</option>
+                            <option value="Action">ACTION</option>
+                            <option value="Adventure">ADVENTURE</option>
+                            <option value="Comedy">COMEDY</option>
+                            <option value="Drama">DRAMA</option>
+                            <option value="Fantasy">FANTASY</option>
+                            <option value="Romance">ROMANCE</option>
+                            <option value="Supernatural">SUPERNATURAL</option>
+                        </select>
+                        <select id="studio-filter" class="terminal-select">
+                            <option value="">ALL STUDIOS</option>
+                            <option value="Studio Pierrot">STUDIO PIERROT</option>
+                            <option value="David Production">DAVID PRODUCTION</option>
+                            <option value="Madhouse">MADHOUSE</option>
+                            <option value="Toei Animation">TOEI ANIMATION</option>
                         </select>
                         <select id="sort-filter" class="terminal-select">
                             <option value="title">SORT BY TITLE</option>
                             <option value="rating">SORT BY RATING</option>
                             <option value="episodes">SORT BY EPISODES</option>
+                            <option value="release_date">SORT BY RELEASE DATE</option>
+                        </select>
+                        <select id="sort-order" class="terminal-select">
+                            <option value="ASC">ASCENDING</option>
+                            <option value="DESC">DESCENDING</option>
                         </select>
                     </div>
                 </div>
@@ -138,6 +185,11 @@
                 <div id="watchlist-grid" class="data-grid">
                     <!-- Watchlist items will be populated by JS -->
                 </div>
+                <div class="pagination">
+                    <button id="watchlist-prev" class="terminal-button">PREV</button>
+                    <span id="watchlist-page-info">PAGE 1 OF 1</span>
+                    <button id="watchlist-next" class="terminal-button">NEXT</button>
+                </div>
             </section>
 
             <!-- Forum Section -->
@@ -147,10 +199,19 @@
                     <div class="cursor-blink">_</div>
                 </div>
                 <div class="forum-controls">
+                    <select id="forum-anime-select" class="terminal-select">
+                        <option value="">SELECT ANIME FOR THREADS</option>
+                    </select>
                     <button id="create-thread" class="terminal-button">CREATE THREAD</button>
+                    <button id="refresh-threads" class="terminal-button">REFRESH</button>
                 </div>
                 <div id="forum-threads" class="forum-list">
-                    <!-- Forum threads will be populated by JS -->
+                    <div class="forum-thread">SELECT AN ANIME TO VIEW THREADS</div>
+                </div>
+                <div class="pagination" id="forum-pagination" style="display: none;">
+                    <button id="forum-prev" class="terminal-button">PREV</button>
+                    <span id="forum-page-info">PAGE 1 OF 1</span>
+                    <button id="forum-next" class="terminal-button">NEXT</button>
                 </div>
             </section>
 
@@ -167,15 +228,42 @@
                             <span id="profile-username">-</span>
                         </div>
                         <div class="profile-field">
+                            <label>EMAIL:</label>
+                            <span id="profile-email">-</span>
+                        </div>
+                        <div class="profile-field">
                             <label>ROLE:</label>
                             <span id="profile-role">-</span>
                         </div>
                         <div class="profile-field">
-                            <label>JOINED:</label>
-                            <span id="profile-joined">-</span>
+                            <label>BIO:</label>
+                            <span id="profile-bio">-</span>
                         </div>
                     </div>
-                    <button id="logout-btn" class="terminal-button danger">TERMINATE SESSION</button>
+                    <div class="profile-actions">
+                        <button id="edit-profile-btn" class="terminal-button">EDIT PROFILE</button>
+                        <button id="logout-btn" class="terminal-button danger">TERMINATE SESSION</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Section -->
+            <section id="admin" class="terminal-section">
+                <div class="section-header">
+                    <h2>ADMIN CONTROL PANEL</h2>
+                    <div class="cursor-blink">_</div>
+                </div>
+                <div class="admin-grid">
+                    <div class="admin-panel">
+                        <h3>ANIME MANAGEMENT</h3>
+                        <button id="create-anime-btn" class="terminal-button">CREATE ANIME</button>
+                    </div>
+                    <div class="admin-panel">
+                        <h3>USER MANAGEMENT</h3>
+                        <div id="user-list">
+                            <!-- Users will be loaded here -->
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -189,7 +277,7 @@
         </footer>
     </div>
 
-    <!-- Modal for anime details -->
+    <!-- Anime Details Modal -->
     <div id="anime-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -199,6 +287,180 @@
             <div id="modal-body" class="modal-body">
                 <!-- Content populated by JS -->
             </div>
+            <div class="modal-footer">
+                <button id="add-to-watchlist-btn" class="terminal-button">ADD TO WATCHLIST</button>
+                <button id="edit-anime-btn" class="terminal-button" style="display: none;">EDIT ANIME</button>
+                <button id="delete-anime-btn" class="terminal-button danger" style="display: none;">DELETE ANIME</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Anime Modal -->
+    <div id="anime-form-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="anime-form-title">CREATE ANIME</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="anime-form" class="terminal-form">
+                    <div class="form-group">
+                        <label>TITLE:</label>
+                        <input type="text" id="anime-title" class="terminal-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>DESCRIPTION:</label>
+                        <textarea id="anime-description" class="terminal-input" rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>GENRE:</label>
+                        <input type="text" id="anime-genre" class="terminal-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>EPISODES:</label>
+                        <input type="number" id="anime-episodes" class="terminal-input" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>STUDIO:</label>
+                        <input type="text" id="anime-studio" class="terminal-input" required>
+                    </div>
+                    <button type="submit" class="terminal-button">SAVE ANIME</button>
+                    <button type="button" class="close-modal terminal-button">CANCEL</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Thread Modal -->
+    <div id="thread-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="thread-modal-title">CREATE THREAD</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="thread-form" class="terminal-form">
+                    <div class="form-group">
+                        <label>TITLE:</label>
+                        <input type="text" id="thread-title" class="terminal-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CONTENT:</label>
+                        <textarea id="thread-content" class="terminal-input" rows="6" required></textarea>
+                    </div>
+                    <button type="submit" class="terminal-button">CREATE THREAD</button>
+                    <button type="button" class="close-modal terminal-button">CANCEL</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thread Details Modal -->
+    <div id="thread-details-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="thread-details-title">THREAD DETAILS</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="thread-details-body" class="modal-body">
+                <!-- Content populated by JS -->
+            </div>
+            <div class="modal-footer">
+                <button id="add-comment-btn" class="terminal-button">ADD COMMENT</button>
+                <button id="edit-thread-btn" class="terminal-button" style="display: none;">EDIT THREAD</button>
+                <button id="delete-thread-btn" class="terminal-button danger" style="display: none;">DELETE THREAD</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Comment Modal -->
+    <div id="comment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>ADD COMMENT</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="comment-form" class="terminal-form">
+                    <div class="form-group">
+                        <label>COMMENT:</label>
+                        <textarea id="comment-content" class="terminal-input" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="terminal-button">POST COMMENT</button>
+                    <button type="button" class="close-modal terminal-button">CANCEL</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="profile-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>EDIT PROFILE</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="profile-form" class="terminal-form">
+                    <div class="form-group">
+                        <label>USERNAME:</label>
+                        <input type="text" id="edit-username" class="terminal-input">
+                    </div>
+                    <div class="form-group">
+                        <label>EMAIL:</label>
+                        <input type="email" id="edit-email" class="terminal-input">
+                    </div>
+                    <div class="form-group">
+                        <label>BIO:</label>
+                        <textarea id="edit-bio" class="terminal-input" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>NEW PASSWORD:</label>
+                        <input type="password" id="edit-password" class="terminal-input" placeholder="Leave blank to keep current">
+                    </div>
+                    <button type="submit" class="terminal-button">UPDATE PROFILE</button>
+                    <button type="button" class="close-modal terminal-button">CANCEL</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Watchlist Entry Modal -->
+    <div id="watchlist-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="watchlist-modal-title">ADD TO WATCHLIST</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="watchlist-form" class="terminal-form">
+                    <div class="form-group">
+                        <label>STATUS:</label>
+                        <select id="watchlist-status" class="terminal-select" required>
+                            <option value="">SELECT STATUS</option>
+                            <option value="watching">WATCHING</option>
+                            <option value="completed">COMPLETED</option>
+                            <option value="plan-to-watch">PLAN TO WATCH</option>
+                            <option value="on-hold">ON HOLD</option>
+                            <option value="dropped">DROPPED</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>RATING (1-5):</label>
+                        <input type="number" id="watchlist-rating" class="terminal-input" min="1" max="5">
+                    </div>
+                    <div class="form-group">
+                        <label>PROGRESS:</label>
+                        <input type="number" id="watchlist-progress" class="terminal-input" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>NOTES:</label>
+                        <textarea id="watchlist-notes" class="terminal-input" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="terminal-button">SAVE TO WATCHLIST</button>
+                    <button type="button" class="close-modal terminal-button">CANCEL</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -207,6 +469,6 @@
         <div class="loading-text">ACCESSING DATABASE<span class="loading-dots">...</span></div>
     </div>
 
-    <script src="/public/js/nostromo.js"></script>
+    <script src="/js/nostromo.js"></script>
 </body>
 </html>
