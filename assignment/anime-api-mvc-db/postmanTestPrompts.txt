@@ -31,124 +31,476 @@ GET    /watchlist/:user_id   - Get user's watchlist
 PUT    /watchlist/:anime_id  - Update watchlist entry
 DELETE /watchlist/:anime_id  - Remove from watchlist
 ----------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+🔑 Authentication Setup
 
-1) for anyone to use (no need login from admin or user)
-----------------------------------------------------
-get/anime
+1) Register a new user
+----------------------
+Method: POST
+URL: http://localhost:3000/register
+Headers: Content-Type: application/json
 
-get/anime/[id number]
-----------------------------------------------------------------------------------------------------
-2) Register a new user:
--------------------
-POST /register
 Body (JSON):
 {
-  "username": "newuser",
-  "email": "new@example.com",
+  "username": "testuser",
+  "email": "test@example.com",
   "password": "password123"
 }
+
+Expected Response (201):
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 4,
+    "username": "testuser",
+    "role": "user",
+    "email": "test@example.com"
+  }
+}
 ------------------------------------------------------------------------------------------------
-3) login:
----------
-POST /login
+2) User Authentication
+-------------------------------------
+Method: POST
+URL: http://localhost:3000/login
+Headers: Content-Type: application/json
+
 Body (JSON):
 {
   "username": "admin",
   "password": "admin123"
 }
+
+Expected Response (200):
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "username": "admin",
+    "role": "admin",
+    "email": "admin@aniconnect.com",
+    "profile_pic": null
+  }
+}
+
 ------------------------------------------------------------------------------------------------
-4) Create new anime (admin only):
+------------------------------------------------------------------------------------------------
+👤 USER MANAGEMENT
+
+3) Get User Profile
 ---------------------------------
-POST /anime
+Method: GET
+URL: http://localhost:3000/users/1
 Headers: 
-  Authorization: Bearer [admin-token]
-Body (JSON):
+  Content-Type: application/json
+  Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+Expected Response (200):
 {
-  "title": "Hunter x Hunter",
-  "description": "Gon Freecss aspires to become a Hunter to find his father",
-  "genre": "Action, Adventure, Fantasy",
-  "episodes": 148,
-  "studio": "Madhouse"
+  "user_id": 1,
+  "username": "admin",
+  "email": "admin@aniconnect.com",
+  "role": "admin",
+  "profile_pic": null,
+  "bio": null
 }
 ------------------------------------------------------------------------------------------------
-5) Watchlist Tests - Add to watchlist (admin or user):
-------------------------------------------------------
-POST /watchlist
-Headers: 
-  Authorization: Bearer [user-token]
-Body (JSON):
-{
-  "anime_id": 2,
-  "status": "watching"
-}
-------------------------------------------------------------------------------------------------
-6) Get user watchlist:
+4) Update User Profile
 ----------------------
-GET /watchlist/2
+Method: PUT
+URL: http://localhost:3000/users/1
 Headers: 
-  Authorization: Bearer [user-token]
+  Content-Type: application/json
+  Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+Body (JSON):
+{
+  "username": "adminuser",
+  "email": "newemail@example.com",
+  "bio": "Updated bio information",
+  "password": "newpassword123"
+}
+
+Expected Response (200):
+{
+  "message": "Profile updated successfully"
+}
 ------------------------------------------------------------------------------------------------
-7) Forum Tests - Create thread (admin or user)
-----------------------------------------------
-POST /threads
+5) Delete User (Admin Only)
+---------------------------
+Method: DELETE
+URL: http://localhost:3000/users/4
 Headers: 
-  Authorization: Bearer [user-token]
+  Authorization: Bearer ADMIN_JWT_TOKEN_HERE
+
+Expected Response (204): (No content)
+------------------------------------------------------------------------------------------------
+🎬 ANIME MANAGEMENT
+
+6)  List All Anime (Advanced Features)
+----------------------------------------------
+Method: GET
+URL: http://localhost:3000/anime
+
+Basic request:
+http://localhost:3000/anime
+
+With filtering & pagination:
+http://localhost:3000/anime?page=1&limit=5&genre=Action&studio=David&sortBy=rating&sortOrder=DESC&search=JoJo
+
+Expected Response (200):
+{
+  "data": [
+    {
+      "anime_id": 1,
+      "title": "JoJo's Bizarre Adventure",
+      "description": "The Joestar family's generational battle against evil",
+      "genre": "Action, Supernatural",
+      "episodes": 190,
+      "release_date": "2012-10-05",
+      "studio": "David Production",
+      "rating": 8.8,
+      "poster_url": null
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 5,
+    "total": 3,
+    "totalPages": 1,
+    "hasNext": false,
+    "hasPrev": false
+  },
+  "filters": {
+    "genre": "Action",
+    "studio": "David",
+    "search": "JoJo",
+    "sortBy": "rating",
+    "sortOrder": "DESC"
+  }
+}
+------------------------------------------------------------------------------------------------
+7) Get Specific Anime
+---------------------
+Method: GET
+URL: http://localhost:3000/anime/1
+
+Expected Response (200):
+{
+  "anime_id": 1,
+  "title": "JoJo's Bizarre Adventure",
+  "description": "The Joestar family's generational battle against evil",
+  "genre": "Action, Supernatural",
+  "episodes": 190,
+  "release_date": "2012-10-05T00:00:00.000Z",
+  "studio": "David Production",
+  "rating": 8.8,
+  "poster_url": null,
+  "created_at": "2025-01-15T...",
+  "updated_at": "2025-01-15T..."
+}
+------------------------------------------------------------------------------------------------
+8) Create New Anime (Admin Only)
+--------------------------------
+Method: POST
+URL: http://localhost:3000/anime
+Headers: 
+  Content-Type: application/json
+  Authorization: Bearer ADMIN_JWT_TOKEN_HERE
+
+Body (JSON):
+{
+  "title": "Attack on Titan",
+  "description": "Humanity fights against giant humanoid Titans",
+  "genre": "Action, Drama",
+  "episodes": 75,
+  "studio": "MAPPA"
+}
+
+Expected Response (201):
+{
+  "anime_id": 4
+}
+------------------------------------------------------------------------------------------------
+9) Update Anime (Admin Only)
+----------------------------
+Method: PUT
+URL: http://localhost:3000/anime/4
+Headers: 
+  Content-Type: application/json
+  Authorization: Bearer ADMIN_JWT_TOKEN_HERE
+
+Body (JSON):
+{
+  "title": "Attack on Titan: Final Season",
+  "description": "Updated description",
+  "genre": "Action, Drama, Military",
+  "episodes": 87,
+  "studio": "MAPPA"
+}
+
+Expected Response (200):
+{
+  "message": "Anime updated successfully"
+}
+------------------------------------------------------------------------------------------------
+10) Delete Anime (Admin Only)
+-----------------------------
+Method: DELETE
+URL: http://localhost:3000/anime/4
+Headers: 
+  Authorization: Bearer ADMIN_JWT_TOKEN_HERE
+
+Expected Response (204): (No content)
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+💬 FORUM SYSTEM
+
+ 11) Create Discussion Thread
+ -----------------------------
+ Method: POST
+URL: http://localhost:3000/threads
+Headers: 
+  Content-Type: application/json
+  Authorization: Bearer USER_JWT_TOKEN_HERE
+
 Body (JSON):
 {
   "anime_id": 1,
-  "title": "Best JoJo villain?",
-  "content": "Who do you think is the best villain in JoJo?"
+  "title": "Best JoJo Part Discussion",
+  "content": "Which JoJo part is your favorite and why? Let's discuss!"
+}
+
+Expected Response (201):
+{
+  "thread_id": 3
 }
 ------------------------------------------------------------------------------------------------
-8) Create comment:
-------------------
-POST /comments
+12)  Get Threads for Anime
+--------------------------
+Method: GET
+URL: http://localhost:3000/threads/1?page=1&limit=10&sortBy=created_at&sortOrder=DESC
+
+Expected Response (200):
+{
+  "data": [
+    {
+      "thread_id": 1,
+      "anime_id": 1,
+      "user_id": 2,
+      "title": "Best JoJo Stand?",
+      "content": "Which Stand ability is most overpowered?",
+      "created_at": "2025-01-15T...",
+      "updated_at": "2025-01-15T...",
+      "view_count": 0,
+      "is_pinned": false,
+      "is_locked": false,
+      "username": "jojofan"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "totalPages": 1
+  }
+}
+------------------------------------------------------------------------------------------------
+13) Update Thread
+-----------------
+Method: PUT
+URL: http://localhost:3000/threads/1
 Headers: 
-  Authorization: Bearer [user-token]
+  Content-Type: application/json
+  Authorization: Bearer USER_JWT_TOKEN_HERE
+
+Body (JSON):
+{
+  "title": "Updated: Best JoJo Stand Discussion",
+  "content": "Updated content for the thread"
+}
+
+Expected Response (200):
+{
+  "message": "Thread updated successfully"
+}
+------------------------------------------------------------------------------------------------
+14) Delete Thread (Admin Only)
+------------------------------
+
+Method: DELETE
+URL: http://localhost:3000/threads/1
+Headers: 
+  Authorization: Bearer ADMIN_JWT_TOKEN_HERE
+
+Expected Response (204): (No content)
+
+------------------------------------------------------------------------------------------------
+15) Add Comment to Thread
+-------------------------
+Method: POST
+URL: http://localhost:3000/comments
+Headers: 
+  Content-Type: application/json
+  Authorization: Bearer USER_JWT_TOKEN_HERE
+
 Body (JSON):
 {
   "thread_id": 1,
-  "content": "Dio is clearly the best villain!"
+  "content": "I think Star Platinum is the strongest stand!",
+  "parent_comment_id": null
+}
+
+For nested reply:
+{
+  "thread_id": 1,
+  "content": "But what about The World?",
+  "parent_comment_id": 1
+}
+
+Expected Response (201):
+{
+  "comment_id": 4
+}
+
+------------------------------------------------------------------------------------------------
+16) Get Thread Comments
+-----------------------
+Method: GET
+URL: http://localhost:3000/comments/1
+
+Expected Response (200):
+[
+  {
+    "comment_id": 1,
+    "thread_id": 1,
+    "user_id": 3,
+    "parent_comment_id": null,
+    "content": "Star Platinum is clearly the best!",
+    "created_at": "2025-01-15T...",
+    "updated_at": "2025-01-15T...",
+    "upvotes": 0,
+    "downvotes": 0,
+    "username": "bleachlover"
+  }
+]
+
+------------------------------------------------------------------------------------------------
+17) Upvote Comment
+------------------
+Method: PUT
+URL: http://localhost:3000/comments/1/upvote
+Headers: 
+  Authorization: Bearer USER_JWT_TOKEN_HERE
+
+Expected Response (200):
+{
+  "message": "Comment upvoted"
 }
 ------------------------------------------------------------------------------------------------
-9) User profile tests - Get user profile
-----------------------------------------
-GET /users/1
-Headers: 
-  Authorization: Bearer [user-token]
-------------------------------------------------------------------------------------------------
-10) Update profile 
+18) Delete Comment
 ------------------
-PUT /users/1
+Method: DELETE
+URL: http://localhost:3000/comments/1
 Headers: 
-  Authorization: Bearer [user-token]
+  Authorization: Bearer USER_JWT_TOKEN_HERE
+
+Expected Response (204): (No content)
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+📝 WATCHLIST MANAGEMENT
+
+19) Add Anime to Watchlist
+--------------------------
+Method: POST
+URL: http://localhost:3000/watchlist
+Headers: 
+  Content-Type: application/json
+  Authorization: Bearer USER_JWT_TOKEN_HERE
+
 Body (JSON):
 {
-  "bio": "Big anime fan since childhood"
+  "anime_id": 2,
+  "status": "plan-to-watch"
 }
 
+Status options: "watching", "completed", "on-hold", "dropped", "plan-to-watch"
 
+Expected Response (201):
+{
+  "message": "Added to watchlist"
+}
+------------------------------------------------------------------------------------------------
+20) Get User's Watchlist
+------------------------
+Method: GET
+URL: http://localhost:3000/watchlist/2
 
+With filters and sorting:
+http://localhost:3000/watchlist/2?page=1&limit=10&status=completed&sortBy=title&sortOrder=ASC
 
+Headers: 
+  Authorization: Bearer USER_JWT_TOKEN_HERE
 
+Expected Response (200):
+{
+  "data": [
+    {
+      "anime_id": 1,
+      "title": "JoJo's Bizarre Adventure",
+      "description": "The Joestar family's generational battle against evil",
+      "genre": "Action, Supernatural",
+      "episodes": 190,
+      "release_date": "2012-10-05T00:00:00.000Z",
+      "studio": "David Production",
+      "rating": 8.8,
+      "poster_url": null,
+      "status": "completed",
+      "rating": 5,
+      "progress": 190,
+      "notes": null,
+      "watchlist_updated": "2025-01-15T..."
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "totalPages": 1
+  }
+}
+------------------------------------------------------------------------------------------------
+21) Update Watchlist Entry
+--------------------------
+Method: PUT
+URL: http://localhost:3000/watchlist/2
+Headers: 
+  Content-Type: application/json
+  Authorization: Bearer USER_JWT_TOKEN_HERE
 
+Body (JSON):
+{
+  "status": "completed",
+  "rating": 4,
+  "progress": 366,
+  "notes": "Great anime, loved the Soul Society arc!"
+}
 
+Expected Response (200):
+{
+  "message": "Watchlist entry updated successfully"
+}
+------------------------------------------------------------------------------------------------
+22)  Remove from Watchlist
+--------------------------
+Method: DELETE
+URL: http://localhost:3000/watchlist/2
+Headers: 
+  Authorization: Bearer USER_JWT_TOKEN_HERE
 
+Expected Response (204): (No content)
+------------------------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+------------------------------------------------------------------------------------------------
 
 
 

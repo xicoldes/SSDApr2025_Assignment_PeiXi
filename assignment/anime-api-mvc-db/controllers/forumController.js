@@ -160,8 +160,9 @@ module.exports = {
       await pool.request()
         .input('comment_id', sql.Int, commentId)
         .query('DELETE FROM forum_comments WHERE comment_id = @comment_id');
-      
+        
       res.status(204).end();
+
     } catch (error) {
       console.error('Delete comment error:', error);
       res.status(500).json({ error: 'Failed to delete comment' });
