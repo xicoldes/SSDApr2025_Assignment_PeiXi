@@ -2,21 +2,8 @@ const request = require('supertest');
 const app = require('../app');
 
 describe('Watchlist API Tests', () => {
-  let userToken;
-  let userId;
-  
-  beforeAll(async () => {
-  // Login as regular user
-  const userLogin = await request(app)
-    .post('/login')
-    .send({
-      username: 'jojofan',
-      password: 'jojo123'
-    });
-    
-  userToken = userLogin.body.token;
-  userId = userLogin.body.user.id; // This should now work with the fixed login response
-});
+  let userToken = global.__TEST_TOKEN__;
+  let userId = global.__TEST_USER__.id;
 
   describe('POST /watchlist', () => {
     test('should add anime to watchlist', async () => {

@@ -65,7 +65,7 @@ describe('Authentication Tests', () => {
       const response = await request(app)
         .post('/register')
         .send(newUser)
-        .expect(200);
+        .expect(201);
       
       expect(response.body).toHaveProperty('token');
       expect(response.body).toHaveProperty('user');

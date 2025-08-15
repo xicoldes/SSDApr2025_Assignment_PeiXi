@@ -62,7 +62,7 @@ module.exports = {
     }
   },
 
-  // NEW: Update thread
+  // NEW: Update thread (only users can edit their own threads)
   updateThread: async (req, res) => {
     try {
       const { title, content } = req.body;
@@ -77,14 +77,14 @@ module.exports = {
       if (threadCheck.recordset.length === 0) {
         return res.status(404).json({ error: 'Thread not found' });
       }
-      
+      // Get thread owner ID 
       const threadOwnerId = threadCheck.recordset[0].user_id;
       
       // Allow update if user owns thread or is admin
       if (threadOwnerId !== req.user.id && req.user.role !== 'admin') {
         return res.status(403).json({ error: 'Not authorized to update this thread' });
       }
-      
+
       await pool.request()
         .input('thread_id', sql.Int, threadId)
         .input('title', sql.VarChar, title)

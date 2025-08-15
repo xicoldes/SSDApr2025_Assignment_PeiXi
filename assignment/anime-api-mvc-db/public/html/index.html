@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANICONNECT TERMINAL - NOSTROMO SYSTEM</title>
+    <link rel="stylesheet" href="/css/nostromo.css">
+    <script src="/js/nostromo.js"></script>
+</head>
+<body>
+    <!-- Scanlines overlay -->
+    <div class="scanlines"></div>
+    
+    <!-- System noise -->
+    <div class="noise"></div>
+
+    <!-- Main terminal container -->
+    <div class="terminal-container">
+        <!-- Header -->
+        <header class="terminal-header">
+            <div class="system-info">
+                <span class="system-name">ANICONNECT</span>
+                <span class="system-status">ONLINE</span>
+                <span class="system-time" id="system-time"></span>
+            </div>
+            <div class="connection-status">
+                <span class="status-indicator active"></span>
+                <span>NOSTROMO.NET.2183</span>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="terminal-nav">
+            <button class="nav-btn active" data-section="dashboard">DASHBOARD</button>
+            <button class="nav-btn" data-section="anime">ANIME.DB</button>
+            <button class="nav-btn" data-section="watchlist">WATCHLIST</button>
+            <button class="nav-btn" data-section="forum">FORUM.SYS</button>
+            <button class="nav-btn" data-section="profile">USER.PROF</button>
+        </nav>
+
+        <!-- Main content area -->
+        <main class="terminal-main">
+            <!-- Login Section -->
+            <section id="login-section" class="terminal-section active">
+                <div class="section-header">
+                    <h2>SYSTEM ACCESS</h2>
+                    <div class="cursor-blink">_</div>
+                </div>
+                <div class="login-container">
+                    <form id="login-form" class="terminal-form">
+                        <div class="form-group">
+                            <label>USER.ID:</label>
+                            <input type="text" id="username" class="terminal-input" placeholder="ENTER USERNAME" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label>ACCESS.CODE:</label>
+                            <input type="password" id="password" class="terminal-input" placeholder="ENTER PASSWORD" autocomplete="off">
+                        </div>
+                        <button type="submit" class="terminal-button">AUTHENTICATE</button>
+                    </form>
+                    <div class="register-link">
+                        <button id="register-toggle" class="link-button">CREATE NEW USER PROFILE</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="terminal-section">
+                <div class="section-header">
+                    <h2>SYSTEM DASHBOARD</h2>
+                    <div class="cursor-blink">_</div>
+                </div>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h3>SYSTEM STATUS</h3>
+                        <div class="status-grid">
+                            <div>CPU: <span class="status-value">87%</span></div>
+                            <div>MEM: <span class="status-value">64%</span></div>
+                            <div>NET: <span class="status-value">ONLINE</span></div>
+                            <div>DB: <span class="status-value">ACTIVE</span></div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3>RECENT ACTIVITY</h3>
+                        <div id="recent-activity" class="activity-log">
+                            <div class="activity-item">> NEW USER REGISTERED</div>
+                            <div class="activity-item">> FORUM POST CREATED</div>
+                            <div class="activity-item">> ANIME ADDED TO DB</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Anime Database Section -->
+            <section id="anime" class="terminal-section">
+                <div class="section-header">
+                    <h2>ANIME DATABASE</h2>
+                    <div class="cursor-blink">_</div>
+                </div>
+                <div class="search-container">
+                    <input type="text" id="anime-search" class="terminal-input" placeholder="SEARCH ANIME DATABASE...">
+                    <div class="filter-controls">
+                        <select id="genre-filter" class="terminal-select">
+                            <option value="">ALL GENRES</option>
+                            <option value="action">ACTION</option>
+                            <option value="comedy">COMEDY</option>
+                            <option value="drama">DRAMA</option>
+                        </select>
+                        <select id="sort-filter" class="terminal-select">
+                            <option value="title">SORT BY TITLE</option>
+                            <option value="rating">SORT BY RATING</option>
+                            <option value="episodes">SORT BY EPISODES</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="anime-grid" class="data-grid">
+                    <!-- Anime items will be populated by JS -->
+                </div>
+                <div class="pagination">
+                    <button id="prev-page" class="terminal-button">PREV</button>
+                    <span id="page-info">PAGE 1 OF 1</span>
+                    <button id="next-page" class="terminal-button">NEXT</button>
+                </div>
+            </section>
+
+            <!-- Watchlist Section -->
+            <section id="watchlist" class="terminal-section">
+                <div class="section-header">
+                    <h2>USER WATCHLIST</h2>
+                    <div class="cursor-blink">_</div>
+                </div>
+                <div class="watchlist-filters">
+                    <button class="filter-btn active" data-status="all">ALL</button>
+                    <button class="filter-btn" data-status="watching">WATCHING</button>
+                    <button class="filter-btn" data-status="completed">COMPLETED</button>
+                    <button class="filter-btn" data-status="plan-to-watch">PLANNED</button>
+                </div>
+                <div id="watchlist-grid" class="data-grid">
+                    <!-- Watchlist items will be populated by JS -->
+                </div>
+            </section>
+
+            <!-- Forum Section -->
+            <section id="forum" class="terminal-section">
+                <div class="section-header">
+                    <h2>FORUM SYSTEM</h2>
+                    <div class="cursor-blink">_</div>
+                </div>
+                <div class="forum-controls">
+                    <button id="create-thread" class="terminal-button">CREATE THREAD</button>
+                </div>
+                <div id="forum-threads" class="forum-list">
+                    <!-- Forum threads will be populated by JS -->
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile" class="terminal-section">
+                <div class="section-header">
+                    <h2>USER PROFILE</h2>
+                    <div class="cursor-blink">_</div>
+                </div>
+                <div class="profile-container">
+                    <div class="profile-info">
+                        <div class="profile-field">
+                            <label>USERNAME:</label>
+                            <span id="profile-username">-</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>ROLE:</label>
+                            <span id="profile-role">-</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>JOINED:</label>
+                            <span id="profile-joined">-</span>
+                        </div>
+                    </div>
+                    <button id="logout-btn" class="terminal-button danger">TERMINATE SESSION</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="terminal-footer">
+            <div class="footer-info">
+                <span>ANICONNECT v2.183 | WEYLAND-YUTANI CORP.</span>
+                <span id="connection-status">CONNECTION: SECURE</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modal for anime details -->
+    <div id="anime-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">ANIME DETAILS</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="modal-body" class="modal-body">
+                <!-- Content populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loading" class="loading">
+        <div class="loading-text">ACCESSING DATABASE<span class="loading-dots">...</span></div>
+    </div>
+
+    <script src="/public/js/nostromo.js"></script>
+</body>
+</html>

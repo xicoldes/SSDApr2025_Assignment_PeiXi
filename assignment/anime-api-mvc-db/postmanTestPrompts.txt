@@ -1,3 +1,37 @@
+// 🔐 AUTH ROUTES
+POST /register    - Create new user account
+POST /login       - Authenticate user
+
+// 👤 USER ROUTES  
+GET    /users/:id      - Get user profile
+PUT    /users/:id      - Update profile
+DELETE /users/:id      - Delete user (admin only)
+
+// 🎬 ANIME ROUTES
+GET    /anime          - List all anime (with filters/pagination)
+GET    /anime/:id      - Get specific anime
+POST   /anime          - Create anime (admin only)
+PUT    /anime/:id      - Update anime (admin only)
+DELETE /anime/:id      - Delete anime (admin only)
+
+// 💬 FORUM ROUTES
+POST   /threads           - Create discussion thread
+GET    /threads/:anime_id - Get threads for anime
+PUT    /threads/:id       - Update thread
+DELETE /threads/:id       - Delete thread (admin only)
+
+POST   /comments            - Add comment to thread
+GET    /comments/:thread_id - Get thread comments
+PUT    /comments/:id/upvote - Upvote comment
+DELETE /comments/:id        - Delete comment
+
+// 📝 WATCHLIST ROUTES
+POST   /watchlist            - Add anime to watchlist
+GET    /watchlist/:user_id   - Get user's watchlist
+PUT    /watchlist/:anime_id  - Update watchlist entry
+DELETE /watchlist/:anime_id  - Remove from watchlist
+----------------------------------------------------------------------------------------------------
+
 1) for anyone to use (no need login from admin or user)
 ----------------------------------------------------
 get/anime

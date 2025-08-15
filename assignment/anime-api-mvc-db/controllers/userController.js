@@ -60,7 +60,7 @@ module.exports = {
       }
       
       await request.query(updateQuery);
-      res.json({ message: 'Profile updated successfully' });
+      res.json({ message: `Profile ${req.params.id} updated successfully` });
     } catch (error) {
       res.status(500).json({ error: 'Failed to update profile' });
     }
@@ -108,7 +108,8 @@ module.exports = {
 
         await transaction.commit();
         console.log('User deletion transaction committed successfully');
-        
+        res.json({ message: `User ${userId} deleted successfully` });
+
         if (userResult.rowsAffected[0] === 0) {
           return res.status(404).json({ error: 'User not found' });
         }

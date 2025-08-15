@@ -29,17 +29,19 @@ module.exports = {
       // Create user
       const newUser = await userModel.createUser(username, email, password);
       
-      // Generate token
+      // Generate JWT token
       const token = jwt.sign(
         {
           id: newUser.user_id,
           username: newUser.username,
           role: newUser.role
         },
+        // Sign with secret key
         process.env.JWT_SECRET,
         { expiresIn: '1h' }
       );
-      
+
+      //return token + user information
       res.status(201).json({
         token,
         user: {
@@ -63,26 +65,27 @@ module.exports = {
     const { username, password } = req.body;
     
     try {
-      // 1. Find user
+      // 1. Find user by username
       const pool = await poolPromise;
       const userResult = await pool.request()
         .input('username', sql.VarChar, username)
         .query('SELECT * FROM users WHERE username = @username');
-      
+
+      // 2. Check if user exists 
       const user = userResult.recordset[0];
       if (!user) {
         logger.warn(`Login failed: User ${username} not found`);
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
-      // 2. Validate password
+      // 3. compare password with stored hash for validation
       const isValid = await bcrypt.compare(password, user.password_hash);
       if (!isValid) {
         logger.warn(`Login failed: Invalid password for ${username}`);
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
-      // 3. Generate token (with expiration)
+      // 4. Generate token (with expiration)
       const token = jwt.sign(
         {
           id: user.user_id,
@@ -93,7 +96,7 @@ module.exports = {
         { expiresIn: '1h' }
       );
 
-      // 4. Successful response
+      // 5. Successful response
       res.json({
         token,
         user: {

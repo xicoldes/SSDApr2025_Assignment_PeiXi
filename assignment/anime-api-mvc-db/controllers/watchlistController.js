@@ -19,7 +19,8 @@ module.exports = {
       if (existing.recordset.length > 0) {
         return res.status(400).json({ error: 'Anime already in watchlist' });
       }
-      
+
+      // Add anime to watchlist
       await pool.request()
         .input('user_id', sql.Int, req.user.id)
         .input('anime_id', sql.Int, anime_id)
@@ -133,6 +134,7 @@ module.exports = {
         return res.status(404).json({ error: 'Watchlist entry not found' });
       }
       
+      // Build update query dynamically
       let updateQuery = 'UPDATE user_anime_list SET ';
       const updates = [];
       const request = pool.request()
