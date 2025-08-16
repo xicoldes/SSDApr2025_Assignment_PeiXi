@@ -15,8 +15,9 @@
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "<rootDir>/tests/jest.setup.js"
-    ],"globalSetup": "<rootDir>/tests/jest.setup.js",
-  "globalTeardown": "<rootDir>/tests/jest.setup.js",
+    ],
+    "globalSetup": "<rootDir>/tests/jest.setup.js",
+    "globalTeardown": "<rootDir>/tests/jest.setup.js",
     "testTimeout": 30000,
     "forceExit": true,
     "detectOpenHandles": true,
@@ -25,15 +26,11 @@
     "collectCoverage": false
   },
   "dependencies": {
-    "bad-words": "^4.0.0",
     "bcryptjs": "2.4.3",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
-    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mssql": "^11.0.1",
-    "redis": "^5.6.0",
-    "socket.io": "^4.8.1",
     "winston": "^3.0.0"
   },
   "devDependencies": {

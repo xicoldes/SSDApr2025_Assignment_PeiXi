@@ -46,7 +46,7 @@ Body (JSON):
 {
   "username": "testuser",
   "email": "test@example.com",
-  "password": "test123"
+  "password": "password123"
 }
 
 Expected Response (201):
@@ -503,7 +503,7 @@ Expected Response (201):
 21) Get User's Watchlist
 ------------------------
 Method: GET
-URL: http://localhost:3000/watchlist/2
+URL: http://localhost:3000/watchlist/2 (using user_id)
 Headers: 
   Authorization: Bearer USER_JWT_TOKEN_HERE
 
@@ -685,3 +685,66 @@ Error Responses:
 - 409 Conflict - Duplicate data (username/email exists)
 - 500 Internal Server Error - Server-side errors
 
+------------------------------------------------------------------------------------------------
+🚀 ADVANCED TESTING FEATURES
+
+Query Parameters Available:
+==========================
+
+Pagination (All list endpoints):
+- page=1 (default: 1)
+- limit=10 (default: 10)
+
+Sorting (All list endpoints):
+- sortBy=field_name
+- sortOrder=ASC|DESC (default: ASC for most, DESC for dates)
+
+Filtering:
+- Anime: genre=Action, studio=MAPPA, search=JoJo
+- Users: role=admin, search=username
+- Watchlist: status=completed
+- Threads: sortBy=created_at|title|view_count
+
+Search Functionality:
+- Anime: Searches title and description
+- Users: Searches username and email
+- Case-insensitive partial matching
+
+------------------------------------------------------------------------------------------------
+💡 TESTING TIPS
+
+1. Always login first to get JWT token
+2. Use proper Content-Type headers for JSON requests
+3. Include Authorization header for protected routes
+4. Test both success and error scenarios
+5. Check response structure matches expected format
+6. Verify pagination metadata is correct
+7. Test filtering and sorting combinations
+8. Ensure security rules are properly enforced
+9. Test cascading deletes (anime deletion removes threads/comments)
+10. Verify foreign key constraints work properly
+
+------------------------------------------------------------------------------------------------
+🎯 DEMO SUGGESTIONS
+
+For Video/Presentation Demo:
+===========================
+
+1. Show database schema and relationships
+2. Demonstrate user registration and authentication
+3. Show admin vs user permission differences
+4. Create, read, update, delete anime (full CRUD)
+5. Demonstrate advanced features (filtering, search, pagination)
+6. Show forum system with nested comments
+7. Demonstrate watchlist management
+8. Show error handling and security
+9. Run automated test suite
+10. Highlight code architecture and best practices
+
+This comprehensive API demonstrates:
+- Professional backend development skills
+- Security best practices
+- Advanced database operations
+- RESTful API design principles
+- Comprehensive testing methodology
+- Enterprise-level features and error handling

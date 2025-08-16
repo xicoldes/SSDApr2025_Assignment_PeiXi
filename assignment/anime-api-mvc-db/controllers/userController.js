@@ -112,49 +112,84 @@ module.exports = {
     }
   },
 
-  // Update user profile
+  // FIXED: Update user profile
   updateProfile: async (req, res) => {
     try {
       const { username, email, password, bio } = req.body;
+      const userId = req.params.id;
       const pool = await poolPromise;
       
-      let updateQuery = 'UPDATE users SET ';
-      const inputs = {
-        user_id: { value: req.params.id, type: sql.Int }
-      };
+      // Check if user exists first
+      const userCheck = await pool.request()
+        .input('user_id', sql.Int, userId)
+        .query('SELECT user_id FROM users WHERE user_id = @user_id');
       
-      if (username) {
-        updateQuery += 'username = @username, ';
-        inputs.username = { value: username, type: sql.VarChar };
+      if (userCheck.recordset.length === 0) {
+        return res.status(404).json({ error: 'User not found' });
       }
       
-      if (email) {
-        updateQuery += 'email = @email, ';
-        inputs.email = { value: email, type: sql.VarChar };
-      }
-      
-      if (password) {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        updateQuery += 'password_hash = @password_hash, ';
-        inputs.password_hash = { value: hashedPassword, type: sql.VarChar };
-      }
-      
-      if (bio) {
-        updateQuery += 'bio = @bio, ';
-        inputs.bio = { value: bio, type: sql.Text };
-      }
-      
-      updateQuery += 'updated_at = GETDATE() WHERE user_id = @user_id';
-      
+      // Build update query dynamically
+      const updateFields = [];
       const request = pool.request();
-      for (const [key, value] of Object.entries(inputs)) {
-        request.input(key, value.type, value.value);
+      
+      // Add user_id parameter
+      request.input('user_id', sql.Int, userId);
+      
+      // Add fields to update based on what's provided
+      if (username !== undefined && username !== '') {
+        updateFields.push('username = @username');
+        request.input('username', sql.VarChar, username);
       }
       
-      await request.query(updateQuery);
-      res.json({ message: `Profile ${req.params.id} updated successfully` });
+      if (email !== undefined && email !== '') {
+        updateFields.push('email = @email');
+        request.input('email', sql.VarChar, email);
+      }
+      
+      if (password !== undefined && password !== '') {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        updateFields.push('password_hash = @password_hash');
+        request.input('password_hash', sql.VarChar, hashedPassword);
+      }
+      
+      if (bio !== undefined) {
+        updateFields.push('bio = @bio');
+        request.input('bio', sql.Text, bio || null);
+      }
+      
+      // If no fields to update, return error
+      if (updateFields.length === 0) {
+        return res.status(400).json({ error: 'No valid fields provided for update' });
+      }
+      
+      // Build the final query
+      const updateQuery = `UPDATE users SET ${updateFields.join(', ')} WHERE user_id = @user_id`;
+      
+      console.log('Update query:', updateQuery);
+      console.log('Update fields:', updateFields);
+      
+      // Execute the update
+      const result = await request.query(updateQuery);
+      
+      console.log('Update result:', result);
+      
+      res.json({ 
+        message: `Profile updated successfully`,
+        updatedFields: updateFields.length
+      });
+      
     } catch (error) {
-      res.status(500).json({ error: 'Failed to update profile' });
+      console.error('Update profile error:', error);
+      
+      // Handle specific SQL Server errors
+      if (error.number === 2627) {
+        return res.status(409).json({ error: 'Username or email already exists' });
+      }
+      
+      res.status(500).json({ 
+        error: 'Failed to update profile',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
     }
   },
 
@@ -198,15 +233,16 @@ module.exports = {
           .input('user_id', sql.Int, userId)
           .query('DELETE FROM users WHERE user_id = @user_id');
 
-        await transaction.commit();
-        console.log('User deletion transaction committed successfully');
-        res.json({ message: `User ${userId} deleted successfully` });
-
         if (userResult.rowsAffected[0] === 0) {
+          await transaction.rollback();
           return res.status(404).json({ error: 'User not found' });
         }
 
+        await transaction.commit();
+        console.log('User deletion transaction committed successfully');
+        
         res.status(204).end();
+        
       } catch (innerError) {
         console.error('Inner transaction error:', innerError);
         await transaction.rollback();
