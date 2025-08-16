@@ -15,7 +15,8 @@
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "<rootDir>/tests/jest.setup.js"
-    ],
+    ],"globalSetup": "<rootDir>/tests/jest.setup.js",
+  "globalTeardown": "<rootDir>/tests/jest.setup.js",
     "testTimeout": 30000,
     "forceExit": true,
     "detectOpenHandles": true,
