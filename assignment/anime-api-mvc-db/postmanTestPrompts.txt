@@ -3,6 +3,7 @@ POST /register    - Create new user account
 POST /login       - Authenticate user
 
 // 👤 USER ROUTES  
+GET    /users          - Get all users (admin only)
 GET    /users/:id      - Get user profile
 PUT    /users/:id      - Update profile
 DELETE /users/:id      - Delete user (admin only)
@@ -88,12 +89,56 @@ Expected Response (200):
 ------------------------------------------------------------------------------------------------
 👤 USER MANAGEMENT
 
-3) Get User Profile
+3) Get All Users (Admin Only)
+------------------------------
+Method: GET
+URL: http://localhost:3000/users
+Headers: Authorization: Bearer ADMIN_JWT_TOKEN_HERE
+
+Auth Required: Yes (Admin)
+
+Advanced Query Examples:
+Basic: http://localhost:3000/users
+With pagination: http://localhost:3000/users?page=1&limit=10
+Filter by role: http://localhost:3000/users?role=admin
+Search users: http://localhost:3000/users?search=john
+Full query: http://localhost:3000/users?page=1&limit=10&role=user&search=jojo&sortBy=created_at&sortOrder=DESC
+
+Expected Response (200):
+{
+  "data": [
+    {
+      "user_id": 1,
+      "username": "admin",
+      "email": "admin@aniconnect.com",
+      "role": "admin",
+      "profile_pic": null,
+      "bio": null,
+      "created_at": "2025-01-15T..."
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 3,
+    "totalPages": 1,
+    "hasNext": false,
+    "hasPrev": false
+  },
+  "filters": {
+    "role": "user",
+    "search": "jojo",
+    "sortBy": "created_at",
+    "sortOrder": "DESC"
+  }
+}
+------------------------------------------------------------------------------------------------
+4) Get User Profile
 ---------------------------------
 Method: GET
 URL: http://localhost:3000/users/1
 
-Auth Required: Yes (Admin)
+Auth Required: Yes
 
 Expected Response (200):
 {
@@ -105,7 +150,7 @@ Expected Response (200):
   "bio": null
 }
 ------------------------------------------------------------------------------------------------
-4) Update User Profile
+5) Update User Profile
 ----------------------
 Method: PUT
 URL: http://localhost:3000/users/1
@@ -122,13 +167,14 @@ Body (JSON):
 
 Expected Response (200):
 {
-  "message": "Profile updated successfully"
+  "message": "Profile 1 updated successfully"
 }
 ------------------------------------------------------------------------------------------------
-5) Delete User (Admin Only)
+6) Delete User (Admin Only)
 ---------------------------
 Method: DELETE
 URL: http://localhost:3000/users/4
+Headers: Authorization: Bearer ADMIN_JWT_TOKEN_HERE
 
 Auth Required: Yes (Admin)
 
@@ -136,7 +182,7 @@ Expected Response (204): (No content)
 ------------------------------------------------------------------------------------------------
 🎬 ANIME MANAGEMENT
 
-6)  List All Anime (Advanced Features)
+7)  List All Anime (Advanced Features)
 ----------------------------------------------
 Method: GET
 URL: http://localhost:3000/anime
@@ -144,17 +190,24 @@ URL: http://localhost:3000/anime
 Basic request:
 http://localhost:3000/anime
 
-With filtering & pagination:
-// Just genre filter:
-GET http://localhost:3000/anime?genre=Action
+Advanced Query Examples:
+Genre filter:
+http://localhost:3000/anime?genre=Action
 
-//Just studio filter (use partial match):
-GET http://localhost:3000/anime?studio=David
+Studio filter (partial match):
+http://localhost:3000/anime?studio=David
 
-//Just search:
-GET http://localhost:3000/anime?search=JoJo
+Search:
+http://localhost:3000/anime?search=JoJo
 
-GET http://localhost:3000/anime?page=1&limit=5&genre=Action&studio=David&sortBy=rating&sortOrder=DESC&search=JoJo
+Pagination:
+http://localhost:3000/anime?page=1&limit=5
+
+Sorting:
+http://localhost:3000/anime?sortBy=rating&sortOrder=DESC
+
+Full advanced query:
+http://localhost:3000/anime?page=1&limit=5&genre=Action&studio=David&sortBy=rating&sortOrder=DESC&search=JoJo
 
 Expected Response (200):
 {
@@ -168,7 +221,9 @@ Expected Response (200):
       "release_date": "2012-10-05",
       "studio": "David Production",
       "rating": 8.8,
-      "poster_url": null
+      "poster_url": null,
+      "created_at": "2025-01-15T...",
+      "updated_at": "2025-01-15T..."
     }
   ],
   "pagination": {
@@ -188,7 +243,7 @@ Expected Response (200):
   }
 }
 ------------------------------------------------------------------------------------------------
-7) Get Specific Anime
+8) Get Specific Anime
 ---------------------
 Method: GET
 URL: http://localhost:3000/anime/1
@@ -208,7 +263,7 @@ Expected Response (200):
   "updated_at": "2025-01-15T..."
 }
 ------------------------------------------------------------------------------------------------
-8) Create New Anime (Admin Only)
+9) Create New Anime (Admin Only)
 --------------------------------
 Method: POST
 URL: http://localhost:3000/anime
@@ -230,7 +285,7 @@ Expected Response (201):
   "anime_id": 4
 }
 ------------------------------------------------------------------------------------------------
-9) Update Anime (Admin Only)
+10) Update Anime (Admin Only)
 ----------------------------
 Method: PUT
 URL: http://localhost:3000/anime/4
@@ -252,7 +307,7 @@ Expected Response (200):
   "message": "Anime updated successfully"
 }
 ------------------------------------------------------------------------------------------------
-10) Delete Anime (Admin Only)
+11) Delete Anime (Admin Only)
 -----------------------------
 Method: DELETE
 URL: http://localhost:3000/anime/4
@@ -264,7 +319,7 @@ Expected Response (204): (No content)
 ------------------------------------------------------------------------------------------------
 💬 FORUM SYSTEM
 
- 11) Create Discussion Thread
+ 12) Create Discussion Thread
  -----------------------------
  Method: POST
 URL: http://localhost:3000/threads
@@ -284,10 +339,16 @@ Expected Response (201):
   "thread_id": 3
 }
 ------------------------------------------------------------------------------------------------
-12)  Get Threads for Anime
+13)  Get Threads for Anime
 --------------------------
 Method: GET
-URL: http://localhost:3000/threads/1?page=1&limit=10&sortBy=created_at&sortOrder=DESC
+URL: http://localhost:3000/threads/1
+
+Advanced Query Examples:
+Basic: http://localhost:3000/threads/1
+With pagination: http://localhost:3000/threads/1?page=1&limit=10
+With sorting: http://localhost:3000/threads/1?sortBy=created_at&sortOrder=DESC
+Full query: http://localhost:3000/threads/1?page=1&limit=10&sortBy=created_at&sortOrder=DESC
 
 Expected Response (200):
 {
@@ -314,7 +375,7 @@ Expected Response (200):
   }
 }
 ------------------------------------------------------------------------------------------------
-13) Update Thread
+14) Update Thread
 -----------------
 Method: PUT
 URL: http://localhost:3000/threads/1
@@ -333,7 +394,7 @@ Expected Response (200):
   "message": "Thread updated successfully"
 }
 ------------------------------------------------------------------------------------------------
-14) Delete Thread (Admin Only)
+15) Delete Thread (Admin Only)
 ------------------------------
 
 Method: DELETE
@@ -344,7 +405,7 @@ Headers:
 Expected Response (204): (No content)
 
 ------------------------------------------------------------------------------------------------
-15) Add Comment to Thread
+16) Add Comment to Thread
 -------------------------
 Method: POST
 URL: http://localhost:3000/comments
@@ -352,14 +413,14 @@ Headers:
   Content-Type: application/json
   Authorization: Bearer USER_JWT_TOKEN_HERE
 
-Body (JSON):
+Regular Comment Body (JSON):
 {
   "thread_id": 1,
   "content": "I think Star Platinum is the strongest stand!",
   "parent_comment_id": null
 }
 
-For nested reply:
+Nested Reply Body (JSON):
 {
   "thread_id": 1,
   "content": "But what about The World?",
@@ -372,7 +433,7 @@ Expected Response (201):
 }
 
 ------------------------------------------------------------------------------------------------
-16) Get Thread Comments
+17) Get Thread Comments
 -----------------------
 Method: GET
 URL: http://localhost:3000/comments/1
@@ -394,7 +455,7 @@ Expected Response (200):
 ]
 
 ------------------------------------------------------------------------------------------------
-17) Upvote Comment
+18) Upvote Comment
 ------------------
 Method: PUT
 URL: http://localhost:3000/comments/1/upvote
@@ -406,7 +467,7 @@ Expected Response (200):
   "message": "Comment upvoted"
 }
 ------------------------------------------------------------------------------------------------
-18) Delete Comment
+19) Delete Comment
 ------------------
 Method: DELETE
 URL: http://localhost:3000/comments/1
@@ -418,7 +479,7 @@ Expected Response (204): (No content)
 ------------------------------------------------------------------------------------------------
 📝 WATCHLIST MANAGEMENT
 
-19) Add Anime to Watchlist
+20) Add Anime to Watchlist
 --------------------------
 Method: POST
 URL: http://localhost:3000/watchlist
@@ -439,16 +500,19 @@ Expected Response (201):
   "message": "Added to watchlist"
 }
 ------------------------------------------------------------------------------------------------
-20) Get User's Watchlist
+21) Get User's Watchlist
 ------------------------
 Method: GET
 URL: http://localhost:3000/watchlist/2
-
-With filters and sorting:
-http://localhost:3000/watchlist/2?page=1&limit=10&status=completed&sortBy=title&sortOrder=ASC
-
 Headers: 
   Authorization: Bearer USER_JWT_TOKEN_HERE
+
+Advanced Query Examples:
+Basic: http://localhost:3000/watchlist/2
+With pagination: http://localhost:3000/watchlist/2?page=1&limit=10
+Filter by status: http://localhost:3000/watchlist/2?status=completed
+With sorting: http://localhost:3000/watchlist/2?sortBy=title&sortOrder=ASC
+Full query: http://localhost:3000/watchlist/2?page=1&limit=10&status=completed&sortBy=title&sortOrder=ASC
 
 Expected Response (200):
 {
@@ -478,7 +542,7 @@ Expected Response (200):
   }
 }
 ------------------------------------------------------------------------------------------------
-21) Update Watchlist Entry
+22) Update Watchlist Entry
 --------------------------
 Method: PUT
 URL: http://localhost:3000/watchlist/2
@@ -499,7 +563,7 @@ Expected Response (200):
   "message": "Watchlist entry updated successfully"
 }
 ------------------------------------------------------------------------------------------------
-22)  Remove from Watchlist
+23)  Remove from Watchlist
 --------------------------
 Method: DELETE
 URL: http://localhost:3000/watchlist/2
@@ -508,59 +572,116 @@ Headers:
 
 Expected Response (204): (No content)
 ------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+🧪 TESTING CREDENTIALS
+
+Test Users (from database seed data):
+====================================
+
+Admin User:
+- Username: "admin"
+- Password: "admin123"
+- Role: "admin"
+- ID: 1
+
+Regular User 1:
+- Username: "jojofan"
+- Password: "jojo123"
+- Role: "user"
+- ID: 2
+
+Regular User 2:
+- Username: "bleachlover"
+- Password: "bleach123"
+- Role: "user"
+- ID: 3
+
+Sample Anime Data:
+=================
+- ID 1: JoJo's Bizarre Adventure (Action, Supernatural) - David Production
+- ID 2: Bleach (Action, Supernatural) - Pierrot
+- ID 3: Naruto (Action, Adventure) - Pierrot
+
+Sample Thread Data:
+==================
+- Thread ID 1: "Best JoJo Stand?" (for Anime ID 1)
+- Thread ID 2: "Bleach Arcs Ranking" (for Anime ID 2)
+
+Sample Comment Data:
+===================
+- Comment ID 1: "Star Platinum is clearly the best!" (Thread 1)
+- Comment ID 2: "But Golden Experience Requiem can literally undo reality" (Thread 1)
+- Comment ID 3: "The Soul Society arc is peak Bleach" (Thread 2)
 
 ------------------------------------------------------------------------------------------------
+🔧 TESTING WORKFLOW
 
+Step-by-Step Testing Process:
+============================
 
+1. AUTHENTICATION SETUP
+   - Test user registration (POST /register)
+   - Test user login (POST /login)
+   - Copy JWT token for subsequent requests
 
+2. USER MANAGEMENT (Admin Features)
+   - Login as admin
+   - Get all users (GET /users)
+   - Update user profile (PUT /users/:id)
+   - Delete user (DELETE /users/:id)
 
+3. ANIME CRUD OPERATIONS
+   - View all anime (GET /anime)
+   - View specific anime (GET /anime/:id)
+   - Create new anime as admin (POST /anime)
+   - Update anime as admin (PUT /anime/:id)
+   - Delete anime as admin (DELETE /anime/:id)
 
+4. ADVANCED ANIME FEATURES
+   - Test filtering by genre
+   - Test filtering by studio
+   - Test search functionality
+   - Test pagination
+   - Test sorting options
 
+5. FORUM SYSTEM
+   - Create discussion thread (POST /threads)
+   - View threads for anime (GET /threads/:anime_id)
+   - Update thread (PUT /threads/:id)
+   - Add comments (POST /comments)
+   - View comments (GET /comments/:thread_id)
+   - Upvote comments (PUT /comments/:id/upvote)
+   - Delete comments/threads
 
+6. WATCHLIST MANAGEMENT
+   - Add anime to watchlist (POST /watchlist)
+   - View personal watchlist (GET /watchlist/:user_id)
+   - Update watchlist entry (PUT /watchlist/:anime_id)
+   - Remove from watchlist (DELETE /watchlist/:anime_id)
 
+7. SECURITY TESTING
+   - Try accessing admin routes with user token (should get 403)
+   - Try accessing protected routes without token (should get 401)
+   - Try accessing other users' data
 
+8. ERROR HANDLING TESTING
+   - Use invalid IDs (should get 404)
+   - Send malformed JSON (should get 400)
+   - Send missing required fields
 
+------------------------------------------------------------------------------------------------
+📊 EXPECTED HTTP STATUS CODES
 
+Success Responses:
+- 200 OK - Successful GET, PUT operations
+- 201 Created - Successful POST operations (create)
+- 204 No Content - Successful DELETE operations
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Error Responses:
+- 400 Bad Request - Malformed request, validation errors
+- 401 Unauthorized - Missing or invalid JWT token
+- 403 Forbidden - Valid token but insufficient permissions
+- 404 Not Found - Resource doesn't exist
+- 409 Conflict - Duplicate data (username/email exists)
+- 500 Internal Server Error - Server-side errors
 
