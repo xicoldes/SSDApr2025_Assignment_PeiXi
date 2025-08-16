@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "test": "jest --forceExit --detectOpenHandles --maxWorkers=1",
     "test:watch": "jest --watch --maxWorkers=1",
     "test:debug": "jest --detectOpenHandles --verbose --maxWorkers=1"
@@ -10,7 +12,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Anime Community API with comprehensive documentation",
   "jest": {
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
@@ -31,11 +33,14 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mssql": "^11.0.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "winston": "^3.0.0"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "jest": "^30.0.5",
+    "nodemon": "^3.0.2",
     "supertest": "^7.1.4"
   }
 }
