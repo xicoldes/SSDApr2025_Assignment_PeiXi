@@ -1,7 +1,5 @@
 # SSDApr2025_Assignment_PeiXi
 
-# SSDApr2025_Assignment_PeiXi
-
 # 🎌 Anime Forum API
 
 A comprehensive RESTful API for an anime community platform built with Node.js, Express, and SQL Server. Features user authentication, anime database management, discussion forums, and personal watchlists.
