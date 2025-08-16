@@ -46,7 +46,7 @@ Body (JSON):
 {
   "username": "testuser",
   "email": "test@example.com",
-  "password": "password123"
+  "password": "test123"
 }
 
 Expected Response (201):

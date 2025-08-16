@@ -37,6 +37,9 @@ const { authenticate, authorize } = require('./middlewares/authMiddleware');
 // API Routes
 // ======================
 
+// // Password Reset Route
+// app.post('/reset-passwords', authController.resetAllPasswords);
+
 // Auth Routes
 app.post('/register', authController.register);
 app.post('/login', authController.login);
