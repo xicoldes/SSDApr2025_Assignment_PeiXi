@@ -414,9 +414,9 @@ const options = {
       }
     ]
   },
-  // Look for Swagger JSDoc comments in these files
+  // 🔥 THIS IS THE KEY CHANGE - Point to the docs folder
   apis: [
-    './app.js'
+    './swagger/docs/*.js'  // Scan all JS files in swagger/docs/
   ]
 };
 
