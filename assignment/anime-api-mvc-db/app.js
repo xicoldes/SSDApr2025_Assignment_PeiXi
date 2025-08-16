@@ -42,6 +42,7 @@ app.post('/register', authController.register);
 app.post('/login', authController.login);
 
 // User Routes
+app.get('/users', authenticate, authorize(['admin']), userController.getAllUsers);
 app.get('/users/:id', authenticate, userController.getUserProfile);
 app.put('/users/:id', authenticate, userController.updateProfile);
 app.delete('/users/:id', authenticate, authorize(['admin']), userController.deleteUser);

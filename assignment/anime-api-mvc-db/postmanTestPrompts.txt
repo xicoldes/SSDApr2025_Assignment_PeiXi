@@ -38,7 +38,8 @@ DELETE /watchlist/:anime_id  - Remove from watchlist
 ----------------------
 Method: POST
 URL: http://localhost:3000/register
-Headers: Content-Type: application/json
+
+Auth Required: No
 
 Body (JSON):
 {
@@ -62,7 +63,8 @@ Expected Response (201):
 -------------------------------------
 Method: POST
 URL: http://localhost:3000/login
-Headers: Content-Type: application/json
+
+Auth Required: No
 
 Body (JSON):
 {
@@ -90,9 +92,8 @@ Expected Response (200):
 ---------------------------------
 Method: GET
 URL: http://localhost:3000/users/1
-Headers: 
-  Content-Type: application/json
-  Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+Auth Required: Yes (Admin)
 
 Expected Response (200):
 {
@@ -108,9 +109,8 @@ Expected Response (200):
 ----------------------
 Method: PUT
 URL: http://localhost:3000/users/1
-Headers: 
-  Content-Type: application/json
-  Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+Auth Required: Yes
 
 Body (JSON):
 {
@@ -129,8 +129,8 @@ Expected Response (200):
 ---------------------------
 Method: DELETE
 URL: http://localhost:3000/users/4
-Headers: 
-  Authorization: Bearer ADMIN_JWT_TOKEN_HERE
+
+Auth Required: Yes (Admin)
 
 Expected Response (204): (No content)
 ------------------------------------------------------------------------------------------------
@@ -145,7 +145,16 @@ Basic request:
 http://localhost:3000/anime
 
 With filtering & pagination:
-http://localhost:3000/anime?page=1&limit=5&genre=Action&studio=David&sortBy=rating&sortOrder=DESC&search=JoJo
+// Just genre filter:
+GET http://localhost:3000/anime?genre=Action
+
+//Just studio filter (use partial match):
+GET http://localhost:3000/anime?studio=David
+
+//Just search:
+GET http://localhost:3000/anime?search=JoJo
+
+GET http://localhost:3000/anime?page=1&limit=5&genre=Action&studio=David&sortBy=rating&sortOrder=DESC&search=JoJo
 
 Expected Response (200):
 {

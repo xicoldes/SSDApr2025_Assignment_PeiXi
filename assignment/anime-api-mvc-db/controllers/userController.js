@@ -2,6 +2,98 @@ const { poolPromise, sql } = require('../dbConfig');
 const bcrypt = require('bcryptjs');
 
 module.exports = {
+  // Get all users (Admin only)
+  getAllUsers: async (req, res) => {
+    try {
+      const {
+        page = 1,
+        limit = 10,
+        role,
+        sortBy = 'created_at',
+        sortOrder = 'DESC',
+        search
+      } = req.query;
+
+      const offset = (page - 1) * limit;
+      const pool = await poolPromise;
+      
+      // Build dynamic query
+      let query = `
+        SELECT 
+          user_id, username, email, role, profile_pic, bio, created_at
+        FROM users
+        WHERE 1=1
+      `;
+      
+      const request = pool.request();
+      
+      // Add filters
+      if (role) {
+        query += ` AND role = @role`;
+        request.input('role', sql.VarChar, role);
+      }
+      
+      if (search) {
+        query += ` AND (username LIKE @search OR email LIKE @search)`;
+        request.input('search', sql.VarChar, `%${search}%`);
+      }
+      
+      // Add sorting (removed updated_at since it doesn't exist)
+      const validSortColumns = ['username', 'email', 'role', 'created_at'];
+      const validSortOrders = ['ASC', 'DESC'];
+      
+      const sortColumn = validSortColumns.includes(sortBy) ? sortBy : 'created_at';
+      const sortDirection = validSortOrders.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
+      
+      query += ` ORDER BY ${sortColumn} ${sortDirection}`;
+      
+      // Add pagination
+      query += ` OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY`;
+      request.input('offset', sql.Int, parseInt(offset));
+      request.input('limit', sql.Int, parseInt(limit));
+      
+      const result = await request.query(query);
+      
+      // Get total count for pagination metadata
+      let countQuery = `SELECT COUNT(*) as total FROM users WHERE 1=1`;
+      const countRequest = pool.request();
+      
+      if (role) {
+        countQuery += ` AND role = @role`;
+        countRequest.input('role', sql.VarChar, role);
+      }
+      
+      if (search) {
+        countQuery += ` AND (username LIKE @search OR email LIKE @search)`;
+        countRequest.input('search', sql.VarChar, `%${search}%`);
+      }
+      
+      const countResult = await countRequest.query(countQuery);
+      const total = countResult.recordset[0].total;
+      
+      res.json({
+        data: result.recordset,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          totalPages: Math.ceil(total / limit),
+          hasNext: page * limit < total,
+          hasPrev: page > 1
+        },
+        filters: {
+          role,
+          search,
+          sortBy: sortColumn,
+          sortOrder: sortDirection
+        }
+      });
+    } catch (error) {
+      console.error('Get all users error:', error);
+      res.status(500).json({ error: 'Failed to fetch users' });
+    }
+  },
+
   // Get user profile by ID
   getUserProfile: async (req, res) => {
     try {
