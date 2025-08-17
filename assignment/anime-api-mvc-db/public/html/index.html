@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ANICONNECT TERMINAL - NOSTROMO SYSTEM</title>
-    <link rel="stylesheet" href="css/nostromo.css">
+    <link rel="stylesheet" href="/css/nostromo.css">
 </head>
 <body>
     <!-- Scanlines overlay -->
@@ -35,6 +35,7 @@
             <button class="nav-btn" data-section="watchlist">WATCHLIST</button>
             <button class="nav-btn" data-section="forum">FORUM.SYS</button>
             <button class="nav-btn" data-section="profile">USER.PROF</button>
+            <button class="nav-btn admin-only" data-section="admin" style="display: none;">ADMIN.SYS</button>
         </nav>
 
         <!-- Main content area -->
@@ -49,16 +50,38 @@
                     <form id="login-form" class="terminal-form">
                         <div class="form-group">
                             <label>USER.ID:</label>
-                            <input type="text" id="username" class="terminal-input" placeholder="ENTER USERNAME" autocomplete="off" required>
+                            <input type="text" id="login-username" class="terminal-input" placeholder="ENTER USERNAME" autocomplete="off" required>
                         </div>
                         <div class="form-group">
                             <label>ACCESS.CODE:</label>
-                            <input type="password" id="password" class="terminal-input" placeholder="ENTER PASSWORD" autocomplete="off" required>
+                            <input type="password" id="login-password" class="terminal-input" placeholder="ENTER PASSWORD" autocomplete="off" required>
                         </div>
                         <button type="submit" class="terminal-button">AUTHENTICATE</button>
                     </form>
                     <div class="register-link">
                         <button id="register-toggle" class="link-button">CREATE NEW USER PROFILE</button>
+                    </div>
+                </div>
+                
+                <!-- Registration Form (Hidden by default) -->
+                <div id="register-container" class="login-container" style="display: none;">
+                    <form id="register-form" class="terminal-form">
+                        <div class="form-group">
+                            <label>USERNAME:</label>
+                            <input type="text" id="register-username" class="terminal-input" placeholder="ENTER USERNAME" required>
+                        </div>
+                        <div class="form-group">
+                            <label>EMAIL:</label>
+                            <input type="email" id="register-email" class="terminal-input" placeholder="ENTER EMAIL" required>
+                        </div>
+                        <div class="form-group">
+                            <label>PASSWORD:</label>
+                            <input type="password" id="register-password" class="terminal-input" placeholder="ENTER PASSWORD" required>
+                        </div>
+                        <button type="submit" class="terminal-button">CREATE PROFILE</button>
+                    </form>
+                    <div class="register-link">
+                        <button id="login-toggle" class="link-button">RETURN TO LOGIN</button>
                     </div>
                 </div>
             </section>
@@ -82,10 +105,10 @@
                     <div class="dashboard-card">
                         <h3>USER STATISTICS</h3>
                         <div class="status-grid">
+                            <div>USERNAME: <span id="dash-username" class="status-value">-</span></div>
                             <div>ROLE: <span id="dash-user-role" class="status-value">USER</span></div>
                             <div>STATUS: <span class="status-value">ACTIVE</span></div>
-                            <div>THREADS: <span class="status-value">0</span></div>
-                            <div>POSTS: <span class="status-value">0</span></div>
+                            <div>THREADS: <span id="dash-threads" class="status-value">0</span></div>
                         </div>
                     </div>
                     <div class="dashboard-card">
@@ -108,14 +131,6 @@
                     <div class="filter-controls">
                         <select id="genre-filter" class="terminal-select">
                             <option value="">ALL GENRES</option>
-                            <option value="Action">ACTION</option>
-                            <option value="Adventure">ADVENTURE</option>
-                            <option value="Comedy">COMEDY</option>
-                            <option value="Drama">DRAMA</option>
-                            <option value="Fantasy">FANTASY</option>
-                            <option value="Romance">ROMANCE</option>
-                            <option value="Sci-Fi">SCI-FI</option>
-                            <option value="Thriller">THRILLER</option>
                         </select>
                         <select id="sort-filter" class="terminal-select">
                             <option value="title-ASC">SORT BY TITLE (A-Z)</option>
@@ -134,9 +149,9 @@
                     <!-- Anime items will be populated by JS -->
                 </div>
                 <div class="pagination">
-                    <button id="prev-page" class="terminal-button">PREV</button>
-                    <span id="page-info">PAGE 1 OF 1</span>
-                    <button id="next-page" class="terminal-button">NEXT</button>
+                    <button id="anime-prev-page" class="terminal-button">PREV</button>
+                    <span id="anime-page-info">PAGE 1 OF 1</span>
+                    <button id="anime-next-page" class="terminal-button">NEXT</button>
                 </div>
             </section>
 
@@ -151,10 +166,16 @@
                     <button class="filter-btn" data-status="watching">WATCHING</button>
                     <button class="filter-btn" data-status="completed">COMPLETED</button>
                     <button class="filter-btn" data-status="plan-to-watch">PLANNED</button>
+                    <button class="filter-btn" data-status="on-hold">ON-HOLD</button>
                     <button class="filter-btn" data-status="dropped">DROPPED</button>
                 </div>
                 <div id="watchlist-grid" class="data-grid">
                     <!-- Watchlist items will be populated by JS -->
+                </div>
+                <div class="pagination">
+                    <button id="watchlist-prev-page" class="terminal-button">PREV</button>
+                    <span id="watchlist-page-info">PAGE 1 OF 1</span>
+                    <button id="watchlist-next-page" class="terminal-button">NEXT</button>
                 </div>
             </section>
 
@@ -167,13 +188,17 @@
                 <div class="forum-controls" style="margin-bottom: 20px;">
                     <button id="create-thread" class="terminal-button">CREATE THREAD</button>
                     <select id="forum-anime-filter" class="terminal-select" style="margin-left: 15px;">
-                        <option value="1">JOJO'S BIZARRE ADVENTURE</option>
-                        <option value="2">BLEACH</option>
-                        <option value="3">DEMON SLAYER</option>
+                        <option value="">SELECT ANIME</option>
                     </select>
+                    <button id="load-threads" class="terminal-button" style="margin-left: 15px;">LOAD THREADS</button>
                 </div>
                 <div id="forum-threads" class="forum-list">
                     <!-- Forum threads will be populated by JS -->
+                </div>
+                <div class="pagination">
+                    <button id="forum-prev-page" class="terminal-button">PREV</button>
+                    <span id="forum-page-info">PAGE 1 OF 1</span>
+                    <button id="forum-next-page" class="terminal-button">NEXT</button>
                 </div>
             </section>
 
@@ -198,6 +223,10 @@
                             <span id="profile-email">-</span>
                         </div>
                         <div class="profile-field">
+                            <label>BIO:</label>
+                            <span id="profile-bio">-</span>
+                        </div>
+                        <div class="profile-field">
                             <label>JOINED:</label>
                             <span id="profile-joined">-</span>
                         </div>
@@ -205,6 +234,51 @@
                     <div class="profile-actions" style="margin-top: 20px;">
                         <button id="edit-profile" class="terminal-button" style="margin-right: 15px;">EDIT PROFILE</button>
                         <button id="logout-btn" class="terminal-button danger">TERMINATE SESSION</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Section -->
+            <section id="admin" class="terminal-section">
+                <div class="section-header">
+                    <h2>ADMIN CONTROL PANEL</h2>
+                    <div class="cursor-blink">_</div>
+                </div>
+                <div class="admin-tabs">
+                    <button class="admin-tab-btn active" data-tab="users">USER MANAGEMENT</button>
+                    <button class="admin-tab-btn" data-tab="anime-admin">ANIME MANAGEMENT</button>
+                </div>
+                
+                <!-- User Management Tab -->
+                <div id="admin-users" class="admin-tab active">
+                    <div class="search-container">
+                        <input type="text" id="user-search" class="terminal-input" placeholder="SEARCH USERS...">
+                        <div class="filter-controls">
+                            <select id="role-filter" class="terminal-select">
+                                <option value="">ALL ROLES</option>
+                                <option value="admin">ADMIN</option>
+                                <option value="moderator">MODERATOR</option>
+                                <option value="user">USER</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="users-grid" class="data-grid">
+                        <!-- Users will be populated by JS -->
+                    </div>
+                    <div class="pagination">
+                        <button id="users-prev-page" class="terminal-button">PREV</button>
+                        <span id="users-page-info">PAGE 1 OF 1</span>
+                        <button id="users-next-page" class="terminal-button">NEXT</button>
+                    </div>
+                </div>
+                
+                <!-- Anime Management Tab -->
+                <div id="admin-anime-admin" class="admin-tab">
+                    <div style="margin-bottom: 20px;">
+                        <button id="add-anime" class="terminal-button">ADD NEW ANIME</button>
+                    </div>
+                    <div id="admin-anime-grid" class="data-grid">
+                        <!-- Admin anime view will be populated by JS -->
                     </div>
                 </div>
             </section>
@@ -219,8 +293,8 @@
         </footer>
     </div>
 
-    <!-- Modal for anime details, thread creation, etc. -->
-    <div id="anime-modal" class="modal">
+    <!-- Universal Modal -->
+    <div id="universal-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modal-title">MODAL TITLE</h3>
@@ -238,6 +312,6 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="js/nostromo.js"></script>
+    <script src="/js/nostromo.js"></script>
 </body>
 </html>
