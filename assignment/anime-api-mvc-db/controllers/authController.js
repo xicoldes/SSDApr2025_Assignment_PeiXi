@@ -114,34 +114,34 @@ module.exports = {
     }
   },
 
-  // // Password reset utility (run once then remove)
-  // resetAllPasswords: async (req, res) => {
-  //   try {
-  //     const users = [
-  //       { username: 'admin', password: 'admin123' },
-  //       { username: 'jojofan', password: 'jojo123' },
-  //       { username: 'bleachlover', password: 'bleach123' }
-  //     ];
+  // Password reset utility (run once then remove)
+  resetAllPasswords: async (req, res) => {
+    try {
+      const users = [
+        { username: 'admin', password: 'admin123' },
+        { username: 'jojofan', password: 'jojo123' },
+        { username: 'bleachlover', password: 'bleach123' }
+      ];
 
-  //     const pool = await poolPromise;
+      const pool = await poolPromise;
       
-  //     for (const user of users) {
-  //       const hash = await bcrypt.hash(user.password, 10);
-  //       await pool.request()
-  //         .input('username', sql.VarChar, user.username)
-  //         .input('hash', sql.VarChar, hash)
-  //         .query('UPDATE users SET password_hash = @hash WHERE username = @username');
-  //       logger.info(`Updated password for ${user.username}`);
-  //     }
+      for (const user of users) {
+        const hash = await bcrypt.hash(user.password, 10);
+        await pool.request()
+          .input('username', sql.VarChar, user.username)
+          .input('hash', sql.VarChar, hash)
+          .query('UPDATE users SET password_hash = @hash WHERE username = @username');
+        logger.info(`Updated password for ${user.username}`);
+      }
 
-  //     res.json({ 
-  //       success: true,
-  //       message: 'All passwords reset successfully' 
-  //     });
+      res.json({ 
+        success: true,
+        message: 'All passwords reset successfully' 
+      });
 
-  //   } catch (error) {
-  //     logger.error('Password reset error:', error);
-  //     res.status(500).json({ error: "Password reset failed" });
-  //   }
-  //}
+    } catch (error) {
+      logger.error('Password reset error:', error);
+      res.status(500).json({ error: "Password reset failed" });
+    }
+  }
 };

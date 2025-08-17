@@ -14,6 +14,8 @@ const { swaggerUi, specs } = require('./swagger');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
+
 // Static Files Configuration
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/css', express.static(path.join(__dirname, 'public', 'css')));
@@ -57,6 +59,9 @@ const { authenticate, authorize } = require('./middlewares/authMiddleware');
 // ======================
 // API Routes
 // ======================
+
+// Password reset utility (run once then remove)
+app.post('/reset-passwords', authController.resetAllPasswords);
 
 // Authentication Routes
 app.post('/register', authController.register);
